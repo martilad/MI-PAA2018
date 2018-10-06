@@ -1,19 +1,14 @@
 import timeit
-from time import sleep
-import numpy as np
-from os import listdir
-from os.path import isfile, join
 import click
 import os 
 import functools
+import numpy as np
 
-best = 0
-solutions = []
-itemsP = []
-itemsW = []
-maxWeight = 0
+from time import sleep
+from os import listdir
+from os.path import isfile, join
 
-"""Create file in csv dormat to write stats."""
+"""Create file in csv format for writing stats."""
 class WriteCSVData():
 
 	def __init__(self, file, sep = ","):
@@ -21,6 +16,7 @@ class WriteCSVData():
 		self.head = None
 		self.sep = sep
 
+	"""Append one line to file, if it is first line -> create header"""
 	def appendLine(self, **kwargs):
 		if self.head is not None:
 			self.writeLine(kwargs=kwargs)
@@ -38,6 +34,7 @@ class WriteCSVData():
 		self.file.write(self.sep.join([str(kwargs[key]) for key in self.head]) + "\n")
 		self.file.flush()
 		
+"""Solver class for one knapSack problem"""
 class KnapSackSolver:
 
 	def __init__(self, problem, repeatB, repeatH):
@@ -54,7 +51,7 @@ class KnapSackSolver:
 		self.itemsW = problem[3:][::2]
 		self.maxWeight = int(problem[2])
 
-		# solve one instance for brute force
+	"""solve one instance for brute force -> method for time meansuring"""
 	def knapSackBruteForce(self, n, currentPrice, currentWeight, knap):
 		if currentWeight > self.maxWeight: return
 		if n == -1 and currentWeight <= self.maxWeight and currentPrice >= self.best:
@@ -66,6 +63,7 @@ class KnapSackSolver:
 		self.knapSackBruteForce(n-1, currentPrice, currentWeight, "0" + knap )
 		self.knapSackBruteForce(n-1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]), "1" + knap)
 
+	"""solve one instance for heuristic price/weight -> method for time meansuring"""
 	def knapSackHPriceWeight(self, priceWeight):
 		weight = 0
 		price = 0
@@ -79,7 +77,7 @@ class KnapSackSolver:
 		tmp.append(self.sol)
 		self.solut = tmp
 
-	# prepare solve one instance for brute force
+	"""Prepare variables for solve one instance for brute force"""
 	def solveTBruteForce(self):
 		self.solutions = []
 		t = self.timeMensure(KnapSackSolver.knapSackBruteForce, self.repeatB, self, int(self.n)-1, 0, 0, "" )
@@ -88,6 +86,7 @@ class KnapSackSolver:
 			self.solutions = [x for x in sor if x[0] == sor[0][0]]
 		return self.solutions, t
 
+	"""Prepare variables for solve one instance heuristic price/weight"""
 	def solveTPriceWeight(self):
 		self.values = []
 		for i in range(int(self.n)):
@@ -97,6 +96,7 @@ class KnapSackSolver:
 		t = self.timeMensure(KnapSackSolver.knapSackHPriceWeight,self.repeatH, self, self.values)
 		return self.solut, t
 	
+	"""Solve brute force and heuristic and compute time for both and and return relative error (opt-heu)/opt"""
 	def solveBothWithError(self):
 		sol, tH = self.solveTPriceWeight()
 		solution, tB = self.solveTBruteForce()
@@ -112,7 +112,7 @@ class KnapSackSolver:
 	Format: ID n, M, weight, price, ...."""
 def loadProblemFromFile(fileName):
 	with open(fileName, 'r') as f:
-		return [x[0:-1].split(" ") for x in f.readlines()]
+		return loadProblemFromOpenFile(f)
 
 """Load problem from open file. 
 	Format: ID n, M, weight, price, ...."""
@@ -132,6 +132,7 @@ def printInlineSolutions(ID, n, solution):
 def my_git():
 	pass
 
+"""Namage function fo subcommand solve. Solve one problem get inline or probles in one file. Use brutforce and print stats to terminal."""
 @my_git.command()
 @click.option('-f', '--file', type=click.File(), metavar='file', help="File with solutions. When is specific file, the inline solution will not be solve.")
 @click.argument('ins', nargs=-1, metavar="inline solution")
@@ -143,6 +144,8 @@ def solve(file, ins):
 	for i in problems:
 		print(printInlineSolutions(i[0], i[1], KnapSackSolver(i, 1).solveTBruteForce()[0]))
 
+"""	Manage function for subcommand stats. Compering algorithm to brute force count time and relative error. 
+	Can list whole directory with instance of problem or one file"""
 @my_git.command()
 @click.option('-o', '--outfile', help="", required=True)
 @click.option('-t', '--time', is_flag=True)
@@ -161,7 +164,6 @@ def stats(outfile, time, error, repeatb, repeath, path):
 			prices = loadProblemFromFile(file)
 			for i in prices:
 				solve(csv, i, repeatb, repeath, time, error)
-				solution, t = solve(i, repeat)
 				
 	elif os.path.isfile(path):  
 		prices = loadProblemFromFile(path)
@@ -171,6 +173,7 @@ def stats(outfile, time, error, repeatb, repeath, path):
 		print("Not a valid directory or file." )
 		exit()
 
+"""Function for solve one instance of problem and write stats to the csv file."""
 def solve(file, ins, repeatb, repeath, time, error):
 	if error:
 		sollution, tH, tB, e = KnapSackSolver(ins, repeatb, repeath).solveBothWithError()
@@ -178,7 +181,7 @@ def solve(file, ins, repeatb, repeath, time, error):
 		return
 	if time:
 		sollution, t = KnapSackSolver(ins, repeatb, repeath).solveTBruteForce()
-		file.appendLine(n=ins[1], time=t, repeat=repeat)
+		file.appendLine(n=ins[1], time=t, repeatB=repeatb, repeatH = repeath)
 		return
 
 if __name__ == '__main__':
