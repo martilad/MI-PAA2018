@@ -3,7 +3,17 @@ from time import sleep
 import numpy as np
 from os import listdir
 from os.path import isfile, join
+import click
+import os 
+import functools
 
+best = 0
+solutions = []
+itemsP = []
+itemsW = []
+maxWeight = 0
+
+"""Create file in csv dormat to write stats."""
 class WriteCSVData():
 
 	def __init__(self, file, sep = ","):
@@ -26,50 +36,150 @@ class WriteCSVData():
 
 	def writeLine(self, kwargs):
 		self.file.write(self.sep.join([str(kwargs[key]) for key in self.head]) + "\n")
+		self.file.flush()
 		
-def knapSackBruteForce(solutions, best, itemsP, itemsW, n, maxWeight, currentPrice, currentWeight, knap):
-	if n == -1 and currentWeight <= maxWeight and currentPrice >= best:
-		tmp = [currentPrice]
-		tmp.append(list(knap))
-		solutions.append(tmp)
-		best = currentPrice
-	if n == -1: return
+class KnapSackSolver:
 
-	knapSackBruteForce(solutions, best, itemsP, itemsW, n-1, maxWeight, currentPrice, currentWeight, "0"+knap )
-	knapSackBruteForce(solutions, best, itemsP, itemsW, n-1, maxWeight, currentPrice + int(itemsP[n]), currentWeight + int(itemsW[n]), "1"+knap )
+	def __init__(self, problem, repeatB, repeatH):
+		self.best = 0
+		self.solutions = []
+		if (len(problem)<2 or (len(problem[3:][1::2]) != len(problem[3:][::2])) or  (len(problem[3:][::2]) != int(problem[1]))):
+			print("Solution: ", problem[0]+" " if len(problem)>0 else "", " Error format.")
+			self.bad = True
+			return
+		self.n = problem[1]
+		self.repeatB = repeatB
+		self.repeatH = repeatH
+		self.itemsP = problem[3:][1::2]
+		self.itemsW = problem[3:][::2]
+		self.maxWeight = int(problem[2])
 
+		# solve one instance for brute force
+	def knapSackBruteForce(self, n, currentPrice, currentWeight, knap):
+		if currentWeight > self.maxWeight: return
+		if n == -1 and currentWeight <= self.maxWeight and currentPrice >= self.best:
+			tmp = [currentPrice]
+			tmp.append(list(knap))
+			self.solutions.append(tmp)
+			self.best = currentPrice
+		if n == -1: return
+		self.knapSackBruteForce(n-1, currentPrice, currentWeight, "0" + knap )
+		self.knapSackBruteForce(n-1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]), "1" + knap)
+
+	def knapSackHPriceWeight(self, priceWeight):
+		weight = 0
+		price = 0
+		for index, priceW in priceWeight:
+			if weight + int(self.itemsW[index]) > self.maxWeight:
+				continue
+			self.sol[index] = 1
+			weight += int(self.itemsW[index])
+			price += int(self.itemsP[index])
+		tmp = [price]
+		tmp.append(self.sol)
+		self.solut = tmp
+
+	# prepare solve one instance for brute force
+	def solveTBruteForce(self):
+		self.solutions = []
+		t = self.timeMensure(KnapSackSolver.knapSackBruteForce, self.repeatB, self, int(self.n)-1, 0, 0, "" )
+		sor = sorted(self.solutions, key=lambda sol: sol[0])[::-1]
+		if (len(sor)>0):
+			self.solutions = [x for x in sor if x[0] == sor[0][0]]
+		return self.solutions, t
+
+	def solveTPriceWeight(self):
+		self.values = []
+		for i in range(int(self.n)):
+			self.values.append([i, float(self.itemsP[i])/float(self.itemsW[i])])
+		self.values = sorted(self.values, key=lambda sol: sol[1])[::-1]
+		self.sol = [0 for x in range(int(self.n))]
+		t = self.timeMensure(KnapSackSolver.knapSackHPriceWeight,self.repeatH, self, self.values)
+		return self.solut, t
+	
+	def solveBothWithError(self):
+		sol, tH = self.solveTPriceWeight()
+		solution, tB = self.solveTBruteForce()
+		return solution, tH, tB, (solution[0][0]-sol[0])/solution[0][0]
+
+	"""Time mensure function for get cpu average time in specific count of run"""
+	def timeMensure(self, function, count, *args):
+		time = timeit.timeit(functools.partial(function, *args), number=count)
+		return (time/count)*1000
+
+
+"""Load problem from file. 
+	Format: ID n, M, weight, price, ...."""
 def loadProblemFromFile(fileName):
 	with open(fileName, 'r') as f:
 		return [x[0:-1].split(" ") for x in f.readlines()]
 
+"""Load problem from open file. 
+	Format: ID n, M, weight, price, ...."""
+def loadProblemFromOpenFile(fileName):
+	return [x[0:-1].split(" ") for x in fileName.readlines()]
 
-def test():
-	"-".join(str(n) for n in range(100))
+def printInlineSolutions(ID, n, solution):
+	ret = ""
+	for i in solution:
+		ret += ID + " " + n +  " " + str(i[0]) 
+		for j in i[1]:
+			ret = ret + " " + j
+		ret += "\n"
+	return ret[0:-1]
 
-def timeMensure(function, count):
-	time = timeit.timeit(function, number=count)
-	return (time/count)*1000
+@click.group()
+def my_git():
+	pass
 
-if __name__ == '__main__':
-	print("Test for 1000 loop in ", timeMensure(function=test, count=1000), " ms.")
-	write = WriteCSVData("test")
-	write.appendLine(n=50, name=10, zeta="lol")
-	onlyFiles = ["testInst/"+f for f in listdir("testInst") if isfile(join("testInst", f))]
+@my_git.command()
+@click.option('-f', '--file', type=click.File(), metavar='file', help="File with solutions. When is specific file, the inline solution will not be solve.")
+@click.argument('ins', nargs=-1, metavar="inline solution")
+def solve(file, ins):
+	if file is None:
+		print(printInlineSolutions(ins[0], ins[1], KnapSackSolver(ins, 1).solveTBruteForce()[0]))
+		return
+	problems = loadProblemFromOpenFile(file)
+	for i in problems:
+		print(printInlineSolutions(i[0], i[1], KnapSackSolver(i, 1).solveTBruteForce()[0]))
 
-	sortOnlyFiles = [(onlyFiles[0].split('_')[0] + "_" + str(y) + "." + ".".join(onlyFiles[0].split('.')[1:])) # do join file name back after sort by numbers
+@my_git.command()
+@click.option('-o', '--outfile', help="", required=True)
+@click.option('-t', '--time', is_flag=True)
+@click.option('-e', '--error', is_flag=True)
+@click.option('-rb', '--repeatB', help="How many times repeat time mensure for brute force to get average on one solution.", type=int, default=1)
+@click.option('-rh', '--repeatH', help="How many times repeat time mensure for heuristic to get average on one solution.", type=int, default=1000)
+@click.option('-p', '--path', help="Path to files or file with sollution to do time mensuring.", required=True)
+def stats(outfile, time, error, repeatb, repeath, path):
+	csv = WriteCSVData(outfile, ",")
+	if os.path.isdir(path):  
+		onlyFiles = ["testInst/"+f for f in listdir("testInst") if isfile(join("testInst", f))]
+		sortOnlyFiles = [(onlyFiles[0].split('_')[0] + "_" + str(y) + "." + ".".join(onlyFiles[0].split('.')[1:])) # do join file name back after sort by numbers
 					for y in sorted(int(x.split("_")[1]) # remove name before number
 					for x in (i.split(".")[0] for i in onlyFiles))] # remove name after number
+		for file in sortOnlyFiles:
+			prices = loadProblemFromFile(file)
+			for i in prices:
+				solve(csv, i, repeatb, repeath, time, error)
+				solution, t = solve(i, repeat)
+				
+	elif os.path.isfile(path):  
+		prices = loadProblemFromFile(path)
+		for i in prices:
+			solve(csv, i, repeatb, repeath, time, error)
+	else:  
+		print("Not a valid directory or file." )
+		exit()
 
-	print(sortOnlyFiles)
-	prices = loadProblemFromFile(sortOnlyFiles[0])
-	for i in prices:
-		solutions = []
-		best = 0
-		knapSackBruteForce(solutions, best, i[3:][1::2], i[3:][::2], int(i[1])-1, int(i[2]), 0, 0, "" )
-		#print (solutions)
-		print(sorted(solutions, key=lambda sol: sol[0])[::-1][0])
-		
-	
+def solve(file, ins, repeatb, repeath, time, error):
+	if error:
+		sollution, tH, tB, e = KnapSackSolver(ins, repeatb, repeath).solveBothWithError()
+		file.appendLine(n=ins[1], error=e, timeBrut=tB, timeHeu = tH, repeatB=repeatb, repeatH = repeath)
+		return
+	if time:
+		sollution, t = KnapSackSolver(ins, repeatb, repeath).solveTBruteForce()
+		file.appendLine(n=ins[1], time=t, repeat=repeat)
+		return
 
-
-
+if __name__ == '__main__':
+	my_git()
