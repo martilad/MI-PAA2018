@@ -43,7 +43,7 @@ class KnapSackSolver:
 		if (len(problem)<2 or (len(problem[3:][1::2]) != len(problem[3:][::2])) or  (len(problem[3:][::2]) != int(problem[1]))):
 			print("Solution: ", problem[0]+" " if len(problem)>0 else "", " Error format.")
 			self.bad = True
-			return
+			raise BaseException()
 		self.n = problem[1]
 		self.repeatB = repeatB
 		self.repeatH = repeatH
@@ -137,38 +137,52 @@ def my_git():
 @click.option('-f', '--file', type=click.File(), metavar='file', help="File with solutions. When is specific file, the inline solution will not be solve.")
 @click.argument('ins', nargs=-1, metavar="inline solution")
 def solve(file, ins):
-	if file is None:
-		print(printInlineSolutions(ins[0], ins[1], KnapSackSolver(ins, 1).solveTBruteForce()[0]))
+	try:
+		if file is None and len(ins)>2:
+			print(printInlineSolutions(ins[0], ins[1], KnapSackSolver(ins, 1, 1).solveTBruteForce()[0]))
+			return
+		elif file is not None:
+			problems = loadProblemFromOpenFile(file)
+			for i in problems:
+				print(printInlineSolutions(i[0], i[1], KnapSackSolver(i, 1, 1).solveTBruteForce()[0]))
+			return
+	except BaseException:
 		return
-	problems = loadProblemFromOpenFile(file)
-	for i in problems:
-		print(printInlineSolutions(i[0], i[1], KnapSackSolver(i, 1).solveTBruteForce()[0]))
+	print("Error - problem format")
 
 """	Manage function for subcommand stats. Compering algorithm to brute force count time and relative error. 
 	Can list whole directory with instance of problem or one file"""
 @my_git.command()
-@click.option('-o', '--outfile', help="", required=True)
-@click.option('-t', '--time', is_flag=True)
+@click.option('--outfile', help="", required=True)
+@click.option('--time', is_flag=True)
 @click.option('-e', '--error', is_flag=True)
-@click.option('-rb', '--repeatB', help="How many times repeat time mensure for brute force to get average on one solution.", type=int, default=1)
-@click.option('-rh', '--repeatH', help="How many times repeat time mensure for heuristic to get average on one solution.", type=int, default=1000)
 @click.option('-p', '--path', help="Path to files or file with sollution to do time mensuring.", required=True)
-def stats(outfile, time, error, repeatb, repeath, path):
+def stats(outfile, time, error, path):
+	repeath = 1000
+	repeatb = 1
 	csv = WriteCSVData(outfile, ",")
-	if os.path.isdir(path):  
-		onlyFiles = ["testInst/"+f for f in listdir("testInst") if isfile(join("testInst", f))]
+	if os.path.isdir(path):
+		repeatb = 1000  
+		onlyFiles = [path+"/"+f for f in listdir(path) if isfile(join(path, f))]
 		sortOnlyFiles = [(onlyFiles[0].split('_')[0] + "_" + str(y) + "." + ".".join(onlyFiles[0].split('.')[1:])) # do join file name back after sort by numbers
 					for y in sorted(int(x.split("_")[1]) # remove name before number
 					for x in (i.split(".")[0] for i in onlyFiles))] # remove name after number
 		for file in sortOnlyFiles:
 			prices = loadProblemFromFile(file)
 			for i in prices:
-				solve(csv, i, repeatb, repeath, time, error)
+				try:
+					solve(csv, i, repeatb, repeath, time, error)
+				except:
+					continue
+			repeatb = 1 if (repeatb - 500 < 1) else repeatb - 500
 				
 	elif os.path.isfile(path):  
 		prices = loadProblemFromFile(path)
 		for i in prices:
-			solve(csv, i, repeatb, repeath, time, error)
+			try:
+				solve(csv, i, repeatb, repeath, time, error)
+			except:
+				continue
 	else:  
 		print("Not a valid directory or file." )
 		exit()
