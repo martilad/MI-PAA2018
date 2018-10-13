@@ -47,7 +47,7 @@ V rámci řešení tedy budu načítat jednotlivé soubory a z nich instance pro
 \section{Popis kostry algoritmu}\label{kap:1}
 Vytvořený algoritmus má dvě možné použití. První je $solve$, které vypíše optimální řešení pro daný problém. Druhý $stats$, který načítá problémy ze souboru nebo soubory s problémy z celé složky. Dále je pro každý problém spočítáno optimální a heuristické řešení. Při běhu je měřen CPU čas pomocí knihovny $timeit$. Pro nejmenší problémy je každé řešení vícenásobně opakováno a je vzata průměrná hodnota. Pro řešení větších problémů se počet opakování snižuje, protože při vyšším čase výpočtu instance již mezi opakováními nejsou téměř žádné rozdíly a vyhodnocování by trvalo příliš dlouhou dobu.
 
-Rekurze v metodě hrubé síly má faktor větvení 2, protože předmět buď do batohu dám nebo ne. V řešení jsem tak odřízl větve, kde již byla překročena maximální hmotnost.
+V řešení jsem také odřízl větve, kde již byla překročena maximální hmotnost.
 
 V heuristickém řešení jsem nejprve spočítal jednotlivé poměry, které jsem seřadil. K seřazení jsem použil seřazenou mapu pro uchování indexu předmětu pro reprezentaci výsledku. Poté jsem postupně zkoušel přidávat předměty od toho s největším poměrem.
 
@@ -66,9 +66,9 @@ Na závěr jsem spočítal relativní chyby pro danou instanci problému $rel = 
 Experimenty jsem prováděl v režimu jednoho vlákna na starším datovém serveru v podobě starého notebooku, který v době výpočtu nebyl používán. Výsledky tedy nejsou ovlivněny jinými běžícími programy. Procesor na testovacím stroji: \textit{Intel Pentium T3400 (2 cores). Taktován na 2.16~GHz s~1~MB cache}.
 Měření času CPU probíhalo v knihovně $timeit$ s několika násobným průchodem pro menší instance.
 
-Na obrázku \ref{fig:1} můžeme vidět závislost výpočetního času metody hrubou silou na velikosti instance. Graf \ref{fig:1} ukazuje, že výpočetní náročnost je exponenciálně závislá na velikosti instance n. Křivka tedy přímo kopíruje exponenciálu. Graf tedy ukázal předpoklad z rozboru řešení. Na grafu je také vidět, že řešení jedné instance velikosti 32, trvalo průměrně kolem 160 minut. Z tohoto důvodu jsem skončil s řešení instance o velikosti 32. Toto omezení ale nemělo velký vliv, protože i~s~ním je exponencíální průběh jasně patrný.
+Na grafu \ref{fig:1} můžeme vidět závislost výpočetního času metody hrubou silou na velikosti instance. Graf \ref{fig:1} ukazuje, že výpočetní náročnost je exponenciálně závislá na velikosti instance n. Křivka tedy přímo kopíruje exponenciálu. Graf tedy ukázal předpoklad z rozboru řešení. Na grafu je také vidět, že řešení jedné instance velikosti 32, trvalo průměrně kolem 160 minut. Z tohoto důvodu jsem skončil s řešení instance o velikosti 32. Toto omezení ale nemělo velký vliv, protože i~s~ním je exponencíální průběh jasně patrný.
 
-Na obrázku \ref{fig:2} Můžeme vidět závislost výpočetního času medoty výpočtu pomocí heuristiky na velikosti instance. Na grafu \ref{fig:1} je vidět  téměř lineární závislost na velikosti vstupní instance n. Tato závislost je tedy ještě výnasobena $log(n)$ pro řadící algoritmus pro pole s poměry. Tento graf tedy opět potvrdil předpoklad.
+Na obrázku \ref{fig:2} Můžeme vidět závislost výpočetního času medoty výpočtu pomocí heuristiky na velikosti instance. Na grafu \ref{fig:2} je vidět  téměř lineární závislost na velikosti vstupní instance n. Tato závislost je tedy ještě výnasobena $log(n)$ pro řadící algoritmus pro pole s poměry. Tento graf tedy opět potvrdil předpoklad.
 \begin{figure}\centering
 	\includegraphics[scale=0.25]{img/3}
  	\caption[3]{Řešení pomocí heuristiky. Velikost relativní chyby.}\label{fig:3}
