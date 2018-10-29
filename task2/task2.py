@@ -77,6 +77,33 @@ class KnapSackSolver:
 		self.knapSackBranchAndBound(n+1, currentPrice, currentWeight, knap + "0" )
 		self.knapSackBranchAndBound(n+1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]),  knap + "1")
 
+	"""dynamic decomposition by weight"""
+	def knapSackDynamicWeight(self, n, currentPrice, currentWeight, knap):
+		#if currentWeight > self.maxWeight: return
+
+
+		
+		if (n > int(self.n)-1) and (currentWeight <= self.maxWeight) and (currentPrice >= self.best):
+			tmp = [currentPrice]
+			tmp.append(list(knap))
+			self.solutions.append(tmp)
+			self.best = currentPrice
+		if n > int(self.n)-1: return
+		self.knapSackDynamicWeight(n+1, currentPrice, currentWeight, knap + "0" )
+		self.knapSackDynamicWeight(n+1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]), knap + "1")
+
+	"""dynamic decomposition by cost"""
+	def knapSackDynamicPrice(self, n, currentPrice, currentWeight, knap):
+		#if currentWeight > self.maxWeight: return
+		if (n > int(self.n)-1) and (currentWeight <= self.maxWeight) and (currentPrice >= self.best):
+			tmp = [currentPrice]
+			tmp.append(list(knap))
+			self.solutions.append(tmp)
+			self.best = currentPrice
+		if n > int(self.n)-1: return
+		self.knapSackDynamicPrice(n+1, currentPrice, currentWeight, knap + "0" )
+		self.knapSackDynamicPrice(n+1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]), knap + "1")
+
 	"""solve one instance for heuristic price/weight -> method for time meansuring"""
 	def knapSackHPriceWeight(self, priceWeight):
 		weight = 0
@@ -104,6 +131,27 @@ class KnapSackSolver:
 	def solveTBranchAndBound(self):
 		t = self.timeMensure(KnapSackSolver.knapSackBranchAndBound, 1, self, 0, 0, 0, "" )
 		t = self.timeMensure(KnapSackSolver.knapSackBranchAndBound, ((int)(self.max / t) if (int)(self.max / t) > 0 else 1), self, 0, 0, 0, "" )
+		sor = sorted(self.solutions, key=lambda sol: sol[0])[::-1]
+		if (len(sor)>0):
+			self.solutions = [x for x in sor if x[0] == sor[0][0]]
+		return self.solutions, t
+
+	"""Prepare variables for solve one instance for brute force"""
+	def solveTDynamicWeight(self):
+		self.weightTable = np.full((int(self.n), self.maxWeight), 0)
+		print(self.weightTable)
+		t = self.timeMensure(KnapSackSolver.knapSackDynamicWeight, 1, self, 0, 0, 0, "" )
+		t = self.timeMensure(KnapSackSolver.knapSackDynamicWeight, ((int)(self.max / t) if (int)(self.max / t) > 0 else 1), self, 0, 0, 0, "" )
+		sor = sorted(self.solutions, key=lambda sol: sol[0])[::-1]
+		if (len(sor)>0):
+			self.solutions = [x for x in sor if x[0] == sor[0][0]]
+		return self.solutions, t
+
+	"""Prepare variables for solve one instance for brute force"""
+	def solveTDynamicPrice(self):
+		self.priceTable = np.full((int(self.n), self.maxWeight), np.inf)
+		t = self.timeMensure(KnapSackSolver.knapSackDynamicPrice, 1, self, 0, 0, 0, "" )
+		t = self.timeMensure(KnapSackSolver.knapSackDynamicPrice, ((int)(self.max / t) if (int)(self.max / t) > 0 else 1), self, 0, 0, 0, "" )
 		sor = sorted(self.solutions, key=lambda sol: sol[0])[::-1]
 		if (len(sor)>0):
 			self.solutions = [x for x in sor if x[0] == sor[0][0]]
@@ -225,20 +273,25 @@ def solve(file, ins, b, h, bb, dc, dw, ftpas):
 	solB = -1
 	solBB = -1
 	solH = -1
+	solDC = -1
+	solDW = -1
 	tB = -1
 	tBB = -1
 	tH = -1
+	tDC = -1
+	tDW = -1
 	if b:
 		tmp, tB = KnapSackSolver(ins).solveTBruteForce()
 		solB = tmp[0][0]
 	if bb:
 		tmp, tBB = KnapSackSolver(ins).solveTBranchAndBound()
-		print(tmp)
 		solBB = tmp[0][0]
 	if dc:
-		...
+		tmp, tDC = KnapSackSolver(ins).solveTDynamicPrice()
+		solDC = tmp[0][0]
 	if dw:
-		...
+		tmp, tDW = KnapSackSolver(ins).solveTDynamicWeight()
+		solDW = tmp[0][0]
 	if h:
 		tmp, tH = KnapSackSolver(ins).solveTPriceWeight()
 		solH = tmp[0][0]
@@ -247,13 +300,17 @@ def solve(file, ins, b, h, bb, dc, dw, ftpas):
 
 	
 	
-	"""print(solB)
-				print(tB)
-				print(solBB)
-				print(tBB)
-				print(solH)
-				print(tH)
-				print()"""
+	print(solB)
+	print(tB)
+	print(solBB)
+	print(tBB)
+	print(solH)
+	print(tH)
+	print(solDC)
+	print(tDC)
+	print(solDW)
+	print(tDW)
+	print()
 	#exit(1)
 	if (solB != solBB):
 		print("toto neni dobre", solBB, solB)
