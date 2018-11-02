@@ -7,6 +7,8 @@ import numpy as np
 from time import sleep
 from os import listdir
 from os.path import isfile, join
+from enum import Enum
+
 
 """Create file in csv format for writing stats."""
 class WriteCSVData():
@@ -37,6 +39,7 @@ class WriteCSVData():
 """Solver class for one knapSack problem"""
 class KnapSackSolver:
 
+
 	def __init__(self, problem):
 		self.max = 0
 		self.best = 0
@@ -64,6 +67,11 @@ class KnapSackSolver:
 		self.knapSackBruteForce(n+1, currentPrice, currentWeight, knap + "0" )
 		self.knapSackBruteForce(n+1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]), knap + "1")
 
+	"""Prepare variables for solve one instance for brute force"""
+	def solveTBruteForce(self):
+		self.solutions = []
+		self.knapSackBruteForce(0, 0, 0, "")
+
 	def knapSackBranchAndBound(self, n, currentPrice, currentWeight, knap):
 		#print(self.itemsP[:len(self.itemsP) - len(knap)], knap)
 		if currentPrice + sum(self.itemsP[len(knap):]) < self.best: return
@@ -77,12 +85,15 @@ class KnapSackSolver:
 		self.knapSackBranchAndBound(n+1, currentPrice, currentWeight, knap + "0" )
 		self.knapSackBranchAndBound(n+1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]),  knap + "1")
 
+	"""Prepare variables for solve one instance for brute force"""
+	def solveTBranchAndBound(self):
+		self.solutions = []
+		self.knapSackBranchAndBound(0, 0, 0, "")
+
 	"""dynamic decomposition by weight"""
 	def knapSackDynamicWeight(self, n, currentPrice, currentWeight, knap):
 		#if currentWeight > self.maxWeight: return
 
-
-		
 		if (n > int(self.n)-1) and (currentWeight <= self.maxWeight) and (currentPrice >= self.best):
 			tmp = [currentPrice]
 			tmp.append(list(knap))
@@ -91,6 +102,14 @@ class KnapSackSolver:
 		if n > int(self.n)-1: return
 		self.knapSackDynamicWeight(n+1, currentPrice, currentWeight, knap + "0" )
 		self.knapSackDynamicWeight(n+1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]), knap + "1")
+
+	"""Prepare variables for solve one instance for brute force"""
+	def solveTDynamicWeight(self):
+		self.weightTable = np.full((int(self.n), self.maxWeight), 0)
+		print(self.maxWeight)
+		print(self.weightTable.shape)
+		print(self.weightTable)
+		self.knapSackDynamicWeight(0, 0, 0, "")
 
 	"""dynamic decomposition by cost"""
 	def knapSackDynamicPrice(self, n, currentPrice, currentWeight, knap):
@@ -103,6 +122,11 @@ class KnapSackSolver:
 		if n > int(self.n)-1: return
 		self.knapSackDynamicPrice(n+1, currentPrice, currentWeight, knap + "0" )
 		self.knapSackDynamicPrice(n+1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]), knap + "1")
+
+	"""Prepare variables for solve one instance for brute force"""
+	def solveTDynamicPrice(self):
+		self.priceTable = np.full((int(self.n), self.maxWeight), np.inf)
+		self.knapSackDynamicPrice(0, 0, 0, "")
 
 	"""solve one instance for heuristic price/weight -> method for time meansuring"""
 	def knapSackHPriceWeight(self, priceWeight):
@@ -118,61 +142,23 @@ class KnapSackSolver:
 		tmp.append(self.sol)
 		self.solutions = [tmp]
 
-	"""Prepare variables for solve one instance for brute force"""
-	def solveTBruteForce(self):
-		t = self.timeMensure(KnapSackSolver.knapSackBruteForce, 1, self, 0, 0, 0, "" )
-		t = self.timeMensure(KnapSackSolver.knapSackBruteForce, ((int)(self.max / t) if (int)(self.max / t) > 0 else 1), self, 0, 0, 0, "" )
-		sor = sorted(self.solutions, key=lambda sol: sol[0])[::-1]
-		if (len(sor)>0):
-			self.solutions = [x for x in sor if x[0] == sor[0][0]]
-		return self.solutions, t
-
-	"""Prepare variables for solve one instance for brute force"""
-	def solveTBranchAndBound(self):
-		t = self.timeMensure(KnapSackSolver.knapSackBranchAndBound, 1, self, 0, 0, 0, "" )
-		t = self.timeMensure(KnapSackSolver.knapSackBranchAndBound, ((int)(self.max / t) if (int)(self.max / t) > 0 else 1), self, 0, 0, 0, "" )
-		sor = sorted(self.solutions, key=lambda sol: sol[0])[::-1]
-		if (len(sor)>0):
-			self.solutions = [x for x in sor if x[0] == sor[0][0]]
-		return self.solutions, t
-
-	"""Prepare variables for solve one instance for brute force"""
-	def solveTDynamicWeight(self):
-		self.weightTable = np.full((int(self.n), self.maxWeight), 0)
-		print(self.weightTable)
-		t = self.timeMensure(KnapSackSolver.knapSackDynamicWeight, 1, self, 0, 0, 0, "" )
-		t = self.timeMensure(KnapSackSolver.knapSackDynamicWeight, ((int)(self.max / t) if (int)(self.max / t) > 0 else 1), self, 0, 0, 0, "" )
-		sor = sorted(self.solutions, key=lambda sol: sol[0])[::-1]
-		if (len(sor)>0):
-			self.solutions = [x for x in sor if x[0] == sor[0][0]]
-		return self.solutions, t
-
-	"""Prepare variables for solve one instance for brute force"""
-	def solveTDynamicPrice(self):
-		self.priceTable = np.full((int(self.n), self.maxWeight), np.inf)
-		t = self.timeMensure(KnapSackSolver.knapSackDynamicPrice, 1, self, 0, 0, 0, "" )
-		t = self.timeMensure(KnapSackSolver.knapSackDynamicPrice, ((int)(self.max / t) if (int)(self.max / t) > 0 else 1), self, 0, 0, 0, "" )
-		sor = sorted(self.solutions, key=lambda sol: sol[0])[::-1]
-		if (len(sor)>0):
-			self.solutions = [x for x in sor if x[0] == sor[0][0]]
-		return self.solutions, t
-
-	"""Prepare variables for solve one instance heuristic price/weight"""
 	def solveTPriceWeight(self):
 		self.values = []
+		self.solutions = []
 		for i in range(int(self.n)):
 			self.values.append([i, float(self.itemsP[i])/float(self.itemsW[i])])
 		self.values = sorted(self.values, key=lambda sol: sol[1])[::-1]
 		self.sol = [0 for x in range(int(self.n))]
-		t = self.timeMensure(KnapSackSolver.knapSackHPriceWeight, 1, self, self.values)
-		t = self.timeMensure(KnapSackSolver.knapSackHPriceWeight, ((int)(self.max / t) if (int)(self.max / t) > 0 else 1), self, self.values)
+		self.knapSackHPriceWeight(self.values)
+
+	"""Prepare variables for solve one instance heuristic price/weight"""
+	def solve(self, ENUM):
+		t = self.timeMensure(ENUM, 1, self)
+		#t = self.timeMensure(ENUM, ((int)(self.max / t) if (int)(self.max / t) > 0 else 1), self)
+		sor = sorted(self.solutions, key=lambda sol: sol[0])[::-1]
+		if (len(sor)>0):
+			self.solutions = [x for x in sor if x[0] == sor[0][0]]
 		return self.solutions, t
-	
-	"""Solve brute force and heuristic and compute time for both and and return relative error (opt-heu)/opt"""
-	def solveBothWithError(self):
-		sol, tH = self.solveTPriceWeight()
-		solution, tB = self.solveTBruteForce()
-		return solution, tH, tB, (solution[0][0]-sol[0])/solution[0][0]
 
 	"""Time mensure function for get cpu average time in specific count of run"""
 	def timeMensure(self, function, count, *args):
@@ -181,6 +167,12 @@ class KnapSackSolver:
 		time = timeit.timeit(functools.partial(function, *args), number=count)
 		return (time/count)*1000
 
+class ALG(Enum):
+	HPW = KnapSackSolver.solveTPriceWeight
+	BT = KnapSackSolver.solveTBruteForce
+	BB = KnapSackSolver.solveTBranchAndBound
+	DC = KnapSackSolver.solveTDynamicPrice
+	DW = KnapSackSolver.solveTDynamicWeight
 
 """Load problem from file. 
 	Format: ID n, M, weight, price, ...."""
@@ -281,34 +273,34 @@ def solve(file, ins, b, h, bb, dc, dw, ftpas):
 	tDC = -1
 	tDW = -1
 	if b:
-		tmp, tB = KnapSackSolver(ins).solveTBruteForce()
+		tmp, tB = KnapSackSolver(ins).solve(ALG.BT)
 		solB = tmp[0][0]
 	if bb:
-		tmp, tBB = KnapSackSolver(ins).solveTBranchAndBound()
+		tmp, tBB = KnapSackSolver(ins).solve(ALG.BB)
 		solBB = tmp[0][0]
 	if dc:
-		tmp, tDC = KnapSackSolver(ins).solveTDynamicPrice()
+		tmp, tDC = KnapSackSolver(ins).solve(ALG.DC)
 		solDC = tmp[0][0]
 	if dw:
-		tmp, tDW = KnapSackSolver(ins).solveTDynamicWeight()
+		tmp, tDW = KnapSackSolver(ins).solve(ALG.DW)
 		solDW = tmp[0][0]
 	if h:
-		tmp, tH = KnapSackSolver(ins).solveTPriceWeight()
+		tmp, tH = KnapSackSolver(ins).solve(ALG.HPW)
 		solH = tmp[0][0]
 	if ftpas:
 		...
 
 	
 	
-	print(solB)
+	print("brut", solB)
 	print(tB)
-	print(solBB)
+	print("BB", solBB)
 	print(tBB)
-	print(solH)
+	print("h", solH)
 	print(tH)
-	print(solDC)
+	print("dc", solDC)
 	print(tDC)
-	print(solDW)
+	print("dw", solDW)
 	print(tDW)
 	print()
 	#exit(1)
