@@ -64,8 +64,9 @@ class KnapSackSolver:
 			self.solutions.append(tmp)
 			self.best = currentPrice
 		if n > int(self.n)-1: return
-		self.knapSackBruteForce(n+1, currentPrice, currentWeight, knap + "0" )
 		self.knapSackBruteForce(n+1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]), knap + "1")
+		self.knapSackBruteForce(n+1, currentPrice, currentWeight, knap + "0" )
+		
 
 	"""Prepare variables for solve one instance for brute force"""
 	def solveTBruteForce(self):
@@ -82,8 +83,9 @@ class KnapSackSolver:
 			self.solutions.append(tmp)
 			self.best = currentPrice
 		if n > int(self.n)-1: return
-		self.knapSackBranchAndBound(n+1, currentPrice, currentWeight, knap + "0" )
 		self.knapSackBranchAndBound(n+1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]),  knap + "1")
+		self.knapSackBranchAndBound(n+1, currentPrice, currentWeight, knap + "0" )
+		
 
 	"""Prepare variables for solve one instance for brute force"""
 	def solveTBranchAndBound(self):
@@ -93,23 +95,36 @@ class KnapSackSolver:
 	"""dynamic decomposition by weight"""
 	def knapSackDynamicWeight(self, n, currentPrice, currentWeight, knap):
 		#if currentWeight > self.maxWeight: return
+		if currentWeight > self.maxWeight: return
 
-		if (n > int(self.n)-1) and (currentWeight <= self.maxWeight) and (currentPrice >= self.best):
-			tmp = [currentPrice]
-			tmp.append(list(knap))
-			self.solutions.append(tmp)
-			self.best = currentPrice
+		if self.weightTable[n][currentWeight] > currentPrice: return
+		self.weightTable[n][currentWeight] = currentPrice
+
+		if (n > int(self.n)-1) and (currentPrice >= self.best[0]):
+			self.best = [currentPrice, currentWeight, n]
 		if n > int(self.n)-1: return
-		self.knapSackDynamicWeight(n+1, currentPrice, currentWeight, knap + "0" )
+
 		self.knapSackDynamicWeight(n+1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]), knap + "1")
+		self.knapSackDynamicWeight(n+1, currentPrice, currentWeight, knap + "0" )
+		
 
 	"""Prepare variables for solve one instance for brute force"""
 	def solveTDynamicWeight(self):
-		self.weightTable = np.full((int(self.n), self.maxWeight), 0)
-		print(self.maxWeight)
-		print(self.weightTable.shape)
-		print(self.weightTable)
+		self.best = [0,0,0]
+		self.weightTable = np.full((int(self.n)+1, self.maxWeight+1), 0)
 		self.knapSackDynamicWeight(0, 0, 0, "")
+		solPrice = self.best[0]
+		sol = ""
+		while(True):
+			if self.weightTable[self.best[2]-1][self.best[1]] != self.weightTable[self.best[2]][self.best[1]]:
+				sol = "1" + sol
+				self.best[1] = self.best[1] - self.itemsW[self.best[2]-1]
+				self.best[0] = self.best[0] - self.itemsP[self.best[2]-1]
+			else:
+				sol = "0" + sol
+			self.best[2] = self.best[2] - 1
+			if self.best[2] == 0: break
+		self.solutions = [[solPrice, list(sol)]]
 
 	"""dynamic decomposition by cost"""
 	def knapSackDynamicPrice(self, n, currentPrice, currentWeight, knap):
