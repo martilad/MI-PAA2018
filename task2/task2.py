@@ -19,7 +19,7 @@ class WriteCSVData():
 		self.sep = sep
 
 	"""Append one line to file, if it is first line -> create header"""
-	def appendLine(self, **kwargs):
+	def appendLine(self, kwargs):
 		if self.head is not None:
 			self.writeLine(kwargs=kwargs)
 		else:
@@ -41,7 +41,7 @@ class KnapSackSolver:
 
 
 	def __init__(self, problem):
-		self.max = 0
+		self.max = 11111
 		self.best = 0
 		self.solutions = []
 		if (len(problem)<2 or (len(problem[3:][1::2]) != len(problem[3:][::2])) or  (len(problem[3:][::2]) != int(problem[1]))):
@@ -94,7 +94,6 @@ class KnapSackSolver:
 
 	"""dynamic decomposition by weight"""
 	def knapSackDynamicWeight(self, n, currentPrice, currentWeight, knap):
-		#if currentWeight > self.maxWeight: return
 		if currentWeight > self.maxWeight: return
 
 		if self.weightTable[n][currentWeight] > currentPrice: return
@@ -128,20 +127,36 @@ class KnapSackSolver:
 
 	"""dynamic decomposition by cost"""
 	def knapSackDynamicPrice(self, n, currentPrice, currentWeight, knap):
-		#if currentWeight > self.maxWeight: return
-		if (n > int(self.n)-1) and (currentWeight <= self.maxWeight) and (currentPrice >= self.best):
-			tmp = [currentPrice]
-			tmp.append(list(knap))
-			self.solutions.append(tmp)
-			self.best = currentPrice
+
+		if currentWeight > self.maxWeight: return
+
+		if self.priceTable[n][currentPrice] < currentWeight: return
+		self.priceTable[n][currentPrice] = currentWeight
+
+		if (n > int(self.n)-1) and (currentPrice >= self.best[0]):
+			self.best = [currentPrice, currentWeight, n]
 		if n > int(self.n)-1: return
-		self.knapSackDynamicPrice(n+1, currentPrice, currentWeight, knap + "0" )
 		self.knapSackDynamicPrice(n+1, currentPrice + int(self.itemsP[n]), currentWeight + int(self.itemsW[n]), knap + "1")
+		self.knapSackDynamicPrice(n+1, currentPrice, currentWeight, knap + "0" )
+		
 
 	"""Prepare variables for solve one instance for brute force"""
 	def solveTDynamicPrice(self):
-		self.priceTable = np.full((int(self.n), self.maxWeight), np.inf)
+		self.best = [0,0,0]
+		self.priceTable = np.full((int(self.n)+1, sum(self.itemsP[:])+1), np.inf)
 		self.knapSackDynamicPrice(0, 0, 0, "")
+		solPrice = self.best[0]
+		sol = ""
+		while(True):
+			if self.priceTable[self.best[2]-1][self.best[0]] != self.priceTable[self.best[2]][self.best[0]]:
+				sol = "1" + sol
+				self.best[0] = self.best[0] - self.itemsP[self.best[2]-1]
+				self.best[1] = self.best[1] - self.itemsW[self.best[2]-1]
+			else:
+				sol = "0" + sol
+			self.best[2] = self.best[2] - 1
+			if self.best[2] == 0: break
+		self.solutions = [[solPrice, list(sol)]]
 
 	"""solve one instance for heuristic price/weight -> method for time meansuring"""
 	def knapSackHPriceWeight(self, priceWeight):
@@ -166,10 +181,44 @@ class KnapSackSolver:
 		self.sol = [0 for x in range(int(self.n))]
 		self.knapSackHPriceWeight(self.values)
 
+	def knapSackFPTAS(self, n, currentPrice, currentWeight, knap):
+		if currentWeight > self.maxWeight: return
+
+		if self.priceTable[n][currentPrice] < currentWeight: return
+		self.priceTable[n][currentPrice] = currentWeight
+
+		if (n > int(self.n)-1) and (currentPrice >= self.best[0]):
+			self.best = [currentPrice, currentWeight, n]
+		if n > int(self.n)-1: return
+		self.knapSackFPTAS(n+1, currentPrice + int(self.itemsPF[n]), currentWeight + int(self.itemsW[n]), knap + "1")
+		self.knapSackFPTAS(n+1, currentPrice, currentWeight, knap + "0" )
+
+	def solveTPFPTAS(self, e):
+		self.best = [0,0,0]
+		maxCost = max(self.itemsP[:])
+		k  = (maxCost * e) / int(self.n)
+		self.itemsPF = [int(i / k) for i in self.itemsP]
+		self.priceTable = np.full((int(self.n)+1, sum(self.itemsPF[:])+1), np.inf)
+		self.knapSackFPTAS(0, 0, 0, "")
+		solPrice = 0
+		sol = ""
+		while(True):
+			if self.priceTable[self.best[2]-1][self.best[0]] != self.priceTable[self.best[2]][self.best[0]]:
+				sol = "1" + sol
+				solPrice += self.itemsP[self.best[2]-1]
+				self.best[0] = self.best[0] - self.itemsPF[self.best[2]-1]
+				self.best[1] = self.best[1] - self.itemsW[self.best[2]-1]
+			else:
+				sol = "0" + sol
+			self.best[2] = self.best[2] - 1
+			if self.best[2] == 0: break
+		self.solutions = [[solPrice, list(sol)]]
+
+
 	"""Prepare variables for solve one instance heuristic price/weight"""
-	def solve(self, ENUM):
-		t = self.timeMensure(ENUM, 1, self)
-		#t = self.timeMensure(ENUM, ((int)(self.max / t) if (int)(self.max / t) > 0 else 1), self)
+	def solve(self, ENUM, *args):
+		t = self.timeMensure(ENUM, 1, self, *args)
+		t = self.timeMensure(ENUM, ((int)(self.max / t) if (int)(self.max / t) > 0 else 1), self, *args)
 		sor = sorted(self.solutions, key=lambda sol: sol[0])[::-1]
 		if (len(sor)>0):
 			self.solutions = [x for x in sor if x[0] == sor[0][0]]
@@ -188,6 +237,7 @@ class ALG(Enum):
 	BB = KnapSackSolver.solveTBranchAndBound
 	DC = KnapSackSolver.solveTDynamicPrice
 	DW = KnapSackSolver.solveTDynamicWeight
+	FPTAS = KnapSackSolver.solveTPFPTAS
 
 """Load problem from file. 
 	Format: ID n, M, weight, price, ...."""
@@ -241,9 +291,9 @@ def solve(file, ins):
 @click.option('-bb', is_flag=True)
 @click.option('-dc', is_flag=True)
 @click.option('-dw', is_flag=True)
-@click.option('-ftpas', is_flag=True)
+@click.option('-fptas', help="Values of epsilon to test separate by comma.")
 @click.option('-p', '--path', help="Path to files or file with sollution to do time mensuring.", required=True)
-def stats(outfile, b, h, bb, dc, dw, ftpas, path):
+def stats(outfile, b, h, bb, dc, dw, fptas, path):
 	if (b or bb or dc or dw) == False:
 		print("Není zadán Exaktní algoritmus, u aproximativních nebude měřena relativní chyba.")
 	csv = WriteCSVData(outfile, ",")
@@ -258,7 +308,7 @@ def stats(outfile, b, h, bb, dc, dw, ftpas, path):
 			prices = loadProblemFromFile(file)
 			for i in prices:
 				try:
-					solve(csv, i, b, h, bb, dc, dw, ftpas)
+					solve(csv, i, b, h, bb, dc, dw, fptas)
 				except Exception as e:
 					raise e
 					continue
@@ -267,7 +317,7 @@ def stats(outfile, b, h, bb, dc, dw, ftpas, path):
 		prices = loadProblemFromFile(path)
 		for i in prices:
 			try:
-				solve(csv, i, b, h, bb, dc, dw, ftpas)
+				solve(csv, i, b, h, bb, dc, dw, fptas)
 			except Exception as e:
 				raise e
 				continue
@@ -275,61 +325,53 @@ def stats(outfile, b, h, bb, dc, dw, ftpas, path):
 		print("Not a valid directory or file." )
 		exit()
 
+def brut_run(err, brut, brutOK, tmp):
+	err = True
+	if brut is None: brut = tmp
+	else:
+		if brut != tmp:
+			brutOK = False
+	return err, brut, brutOK
+
+def error(sol, best):
+	return (best - sol)/best
+
+
 """Function for solve one instance of problem and write stats to the csv file."""
-def solve(file, ins, b, h, bb, dc, dw, ftpas):
-	solB = -1
-	solBB = -1
-	solH = -1
-	solDC = -1
-	solDW = -1
-	tB = -1
-	tBB = -1
-	tH = -1
-	tDC = -1
-	tDW = -1
+def solve(file, ins, b, h, bb, dc, dw, fptas):
+	kwargs = {}
+	kwargs['n'] = ins[1]
+	err = False
+	brut = None
+	brutOK = True
 	if b:
 		tmp, tB = KnapSackSolver(ins).solve(ALG.BT)
-		solB = tmp[0][0]
+		err, brut, brutOK = brut_run(err, brut, brutOK, tmp[0][0])
+		kwargs['tB'] = tB 
 	if bb:
 		tmp, tBB = KnapSackSolver(ins).solve(ALG.BB)
-		solBB = tmp[0][0]
+		err, brut, brutOK = brut_run(err, brut, brutOK, tmp[0][0])
+		kwargs['tBB'] = tBB
 	if dc:
 		tmp, tDC = KnapSackSolver(ins).solve(ALG.DC)
-		solDC = tmp[0][0]
+		err, brut, brutOK = brut_run(err, brut, brutOK, tmp[0][0])
+		kwargs['tDC'] = tDC
 	if dw:
 		tmp, tDW = KnapSackSolver(ins).solve(ALG.DW)
-		solDW = tmp[0][0]
+		err, brut, brutOK = brut_run(err, brut, brutOK, tmp[0][0])
+		kwargs['tDW'] = tDW
 	if h:
 		tmp, tH = KnapSackSolver(ins).solve(ALG.HPW)
-		solH = tmp[0][0]
-	if ftpas:
-		...
-
-	
-	
-	print("brut", solB)
-	print(tB)
-	print("BB", solBB)
-	print(tBB)
-	print("h", solH)
-	print(tH)
-	print("dc", solDC)
-	print(tDC)
-	print("dw", solDW)
-	print(tDW)
-	print()
-	#exit(1)
-	if (solB != solBB):
-		print("toto neni dobre", solBB, solB)
-	return
-	if error:
-		sollution, tH, tB, e = KnapSackSolver(ins, repeatb, repeath).solveBothWithError()
-		file.appendLine(n=ins[1], error=e, timeBrut=tB, timeHeu = tH, repeatB=repeatb, repeatH = repeath)
-		return
-	if time:
-		sollution, t = KnapSackSolver(ins, repeatb, repeath).solveTBruteForce()
-		file.appendLine(n=ins[1], time=t, repeatB=repeatb, repeatH = repeath)
-		return
+		kwargs['tH'] = tH
+		if err: kwargs['errH'] = error(tmp[0][0], brut)
+	if fptas:
+		for i in [float(s) for s in fptas.split(',')]:
+			tmp, tFPTAS = KnapSackSolver(ins).solve(ALG.FPTAS, i)
+			kwargs['tFPTASeps'+str(i)] = tFPTAS
+			if err: kwargs['errFPTASeps'+str(i)] = error(tmp[0][0], brut)
+	kwargs['err'] = err
+	kwargs['brutOK'] = brutOK
+	file.appendLine(kwargs)
 
 if __name__ == '__main__':
 	my_git()
