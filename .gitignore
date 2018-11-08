@@ -1,3 +1,7 @@
 .ipynb_checkpoints
 __venv__
 *(copy*)*
+*.aux
+*.log
+*.out
+*.synctex.*
