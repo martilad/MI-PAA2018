@@ -13,7 +13,7 @@
 \clubpenalty 10000
 \widowpenalty 10000
 
-\title{1. Řešení problému batohu metodou hrubé síly a jednoduchou heuristikou}
+\title{2. Řešení problému batohu dynamickým programováním, metodou větví a hranic a aproximativním algoritmem}
 \author{Ladislav Martínek}
 \date{}
 \maketitle
@@ -21,68 +21,171 @@
 \section{Zadání úlohy} 
 
 
+
+Naprogramujte řešení \href{http://www.csc.kth.se/~viggo/wwwcompendium/node211.html#7374}{problému batohu}:
 \begin{enumerate}
-\item Naprogramujte řešení 0/1 \href{http://www.csc.kth.se/~viggo/wwwcompendium/node211.html#7374}{problému batohu} hrubou silou (tj. nalezněte skutečné optimum). Na zkušebních datech pozorujte závislost výpočetního času na n. 
-\item Naprogramujte řešení problému batohu   heuristikou podle poměru cena/váha. Pozorujte
+\item metodou větví a hranic (B\&B) tak, aby omezujícím faktorem byla hodnota optimalizačního kritéria. Tj. použijte ořezávání shora (překročení kapacity batohu) i zdola (stávající řešení nemůže být lepší než nejlepší dosud nalezené),
+\item metodou dynamického programování,
+\item FPTAS algoritmem, tj. s použitím modifikovaného dynamického programování s dekompozicí podle ceny.
+\end{enumerate}
 
-\begin{itemize}
-\item závislost výpočetního času na n. Grafy jsou vítány (i pro exaktní metodu).
-\item průměrnou a maximální relativní chybu (tj. zhoršení proti exaktní metodě) v závislosti na n.
-\end{itemize}
-\end{enumerate}  
+\section{Rozbor řešení}\label{kap:1}
 
-\section{Rozbor možných variant řešení}
+Problém batohu a rozbor řešení pomocí hrubé síly a jednoduché heuristiky jsem podrobněji popsal v úloze č.1. Rozbor problému v této zprávě tedy nebudu rozvádět a zaměřím se především na nově metody, které byly do implementovány do testovacího programu.
 
-Problém batohu je zadán vstupními proměnnými, tedy vektorem hmotností a cen jednotlivých předmětů. Dále omezením, což je maximální hmotnost, kterou lze do batohu naložit. Konfigurační proměnná je binární vektor, který specifikuje zdali se předmět v batohu nachází (1) nebo nenachází (0). Formát výstupu je shodný s konfigurační proměnou.
+Metodu hrubé síly z předchozího úkolu jsem malinko opravil, aby opravdu testovala všechny možnosti, tedy jsem opravil přerušení po přesažení kapacity batohu, i když zlepšení je nepatrné, nyní metoda hrubé síly opravdu vyzkouší všechny možnosti.
 
-Problém batohu lze řešit exaktně tzv. hrubou silou, pomocí které lze nalézt optimální řešení. Pro hledání optimálního řešení tedy vyzkoušíme všechny možné konfigurace obsahu batohu. Z této úvahy vyplývá, že je nutné vyzkoušet $2^n$ konfigurací, kde $n$ je počet předmětů, ze kterých lze vybírat. 
+První novou metodou je metoda větví a hranic (B\&B), která vylepšuje původní algoritmus o ořezávání větví, které již nemohou dosáhnout lepšího řešení, než které bylo dosaženo doposud. Pokud si uchovávám nejlepší dosažené řešení, tak při každém kroku rekurze mužu k aktuální ceně přičíst součet cen všech zbývajících předmětů a pokud cena nebude větší než současné maximum, tak mohu tuto větev ukončit. Dále lze odřezávat větve, které přesáhly maximální kapacitu batohu.
 
-Dalším možným řešením problému batohu je řešením pomocí jednoduché heuristiky, která bere v úvahu poměr $\frac{\text{cena}}{\text{váha}}$. Objekty poté přidáváme do batohu v pořadí podle velikosti tohoto poměru. Poměr přesně určuje pořadí přidávání předmětů do batohu. Algoritmus s heuristikou je tedy deterministický. Při běhu je nutné provést počet kroků, který vychází z toho, že pro každý předmět spočítám poměr a~předměty podle poměru seřadím. Dále postupně zkouším každý předmět přidat do batohu v pořadí podle poměru. Algoritmus s touto heuristikou však nemusí nalézt vždy optimální řešení a~je závislý na vstupních parametrech. Existují tedy instance problému, pro které je bezchybný a takové instance, pro které vykazuje vysokou chybu.
+Dalšími implementovaným algoritmem bylo dynamické programování. Dynamické programování je vždy spojeno buď s dekompozicí podle ceny nebo podle kapacity. 
+Hodnoty z běhu jsou tedy ukládány do tabulky velikosti $n*M$, kde $n$ je počet předmětů a $M$ je závislé na dané dekompozici. Pokud je dekompozice podle ceny, je $M$ maximální cena a hodnoty v tabulce jsou dosažené kapacity. Pokud podle kapacity, tak $M$ je kapacita batohu a hodnoty v tabulce jsou dosažené ceny. 
+Algoritmus se proto také nazývá pseudopolynomiální, je polynoiální ve velikosti instance, ale obsahuje parametr, který s její velikostí nesouvisí. Souvisí buď s kapacitou batohu nebo maximální cenou. 
 
-\section{Rámcový popis postupu řešení}
-Cílem úlohy bylo vyhodnotit časovou náročnost obou řešení, tedy jak metody hrubou silou, tak jednoduchou heuristikou. Problém hrubou silou jsem řešil rekurzivní metodou, protože je výhodný její komfortní a přehledný zápis. 
+Metoda FPTAS je plně polynomiální aproximační schéma. Algoritmus je implementován na základě algoritmu dynamického programování a dekompozicí podle ceny. Algoritmus umožnuje nastavení parametru $\epsilon$. Tímto parametrem lze měnit přesnost řešení. Pomocí $\epsilon$ lze nastavit maximální chybu. Podle vzorce $$\text{nová cena předmětu} = \text{původní cena předmětu}/\frac{\mathbf{\epsilon} *  \text{max(cena předmětu)}}{n}$$ je přepočtena cena předmětů a tím je zmenšena (při hodně malé volbě $\epsilon$ a malé maximální ceně a vetšímu n se může i zvětšit) tabulka dynamického programování a snížena paměťová i časová náročnost.
 
-V rámci řešení tedy budu načítat jednotlivé soubory a z nich instance problému a každou instanci vyřeším. Při řešení budu měřit výkon a následně počítat relativní chybu pro každou instanci. Jednotlivá data budu ukládat do csv souborů.
+\section{Popis kostry algoritmu}\label{kap:2}
+Základní kostra algoritmu zůstala stejná, pořád umožnuje obě použití, jak $solve$, tak $stats$. Přibyly boolovské přepínače pro každý algoritmus, tedy zdali má být testován a pro FPTAS přepínač očekává seznam epsilon, které má otestovat. Měření času je stále stejné a počet opakování je prováděno v závislosti na rychlosti výpočtu.
 
-\section{Popis kostry algoritmu}\label{kap:1}
-Vytvořený algoritmus má dvě možné použití. První je $solve$, které vypíše optimální řešení pro daný problém. Druhý $stats$, který načítá problémy ze souboru nebo soubory s problémy z celé složky. Dále je pro každý problém spočítáno optimální a heuristické řešení. Při běhu je měřen CPU čas pomocí knihovny $timeit$. Pro nejmenší problémy je každé řešení vícenásobně opakováno a je vzata průměrná hodnota. Pro řešení větších problémů se počet opakování snižuje, protože při vyšším čase výpočtu instance již mezi opakováními nejsou téměř žádné rozdíly a vyhodnocování by trvalo příliš dlouhou dobu.
+Algoritmus provede měření pro všechny uvedené algoritmy zkontroluje zdali jsou optima stejná u algoritmů, která mají optima dosáhnout a spočítá relativní chyby u aproximačních algoritmů ($\frac{c(OPT) - c(APX)}{c(OPT)}$). Data jsou ukládána do do csv souboru pro každou instanci.
 
-V řešení jsem také odřízl větve, kde již byla překročena maximální hmotnost.
+Všechna měření jsou vždy prováděna i s předzpracováním. Jediné co algoritmus dostavá jsou parametry (např. max kapacita nebo $\epsilon$) a dvě pole. Jedno s cenami a druhé s hmotnostmi.
 
-V heuristickém řešení jsem nejprve spočítal jednotlivé poměry, které jsem seřadil. K seřazení jsem použil seřazenou mapu pro uchování indexu předmětu pro reprezentaci výsledku. Poté jsem postupně zkoušel přidávat předměty od toho s největším poměrem.
+\subsection{Metoda větví a hranic (B\&B)}
+Metoda vetví a hranic jsem implementoval do rekurze a při každém přidání předmětu je kontrolováno zdali řešení nepřekročilo maximální váhu a nebo zdali může překonat prozatimní nejlepší řešení. Součet zbývajících cen provádím při každé kontrole. Tento krok by mohl být zrychlen předpočítáním jednotlivých součtů do pole vždy pro $x$ přeskočených hodnot. 
 
-Na závěr jsem spočítal relativní chyby pro danou instanci problému $rel = \frac{c(OPT) - c(APX)}{c(OPT)}$. Data jsem ukládána po jednotlivých instancí. Průměrování jsem prováděl při tvorbě vizualizace, protože na těchto datech jednotlivých instancí lze počítat různé statistické ukazatele pro jednotlivé velikosti instancí.
+\subsection{Dynamické programování}
+Zde jsem implementoval obě dekompozice. V dekompozici podle kapacity vytvořím pole pomocí numpy o velikosti $(n+1)*(\text{kapacita batohu} + 1)$ a inicializované nulami. V každém kroku do dané buňku ukládám aktuální dosaženou cenu, pokud již v buňce cena je a je vyšší můžu tuto větev odříznout.
+
+V dekompozici podle ceny vytvořím pole o velikosti $(n+1)*(\text{součet cen} + 1)$ a inicializované maximální hodnotou. V každém kroku do dané buňku ukládám aktuální dosaženou kapacitu, pokud již v buňce hodnota je a je nižší můžu tuto větev odříznout.
+
+Rekonstrukci řešení provedu zpětně od optímálního, tak že se koukám do vedlejší buňky zdali je hodnota stejná, pokud ano předmět na dané pozici nebyl přídán a pokud ne posunu se v tabulce a patřičný počet kroků a předmět přidám.
+
+\subsection{FPTAS}
+FPTAS je implementováno stejně jako dynamické programování s dekompozicí podle ceny. Jediná změna proběhla v předzpracování cen a tabulky pro dynamické programování. Ceny jsou přepočítány podle vzorce z sekce \ref{kap:1} a podle nových cen vytvořena nová tabulka. 
+
+Při rekonstrukci řešení postupuji stejně jako u dynamického programování, jen pokud předmět do řešení dávám tak přičítám původní hodnotu na dané pozici.
 
 \section{Experimenty}
-\begin{figure}\centering
-	\includegraphics[scale=0.25]{img/boxBB}
- 	\caption[1]{Brute-force řešení. Časová náročnost.}\label{fig:1}
- \end{figure} 	
- \begin{figure}\centering
-	\includegraphics[scale=0.25]{img/boxBB}
- 	\caption[2]{Řešení pomocí heuristiky. Časová náročnost.}\label{fig:2}
- \end{figure} 	
  
 Experimenty jsem prováděl v režimu jednoho vlákna na starším datovém serveru v podobě starého notebooku, který v době výpočtu nebyl používán. Výsledky tedy nejsou ovlivněny jinými běžícími programy. Procesor na testovacím stroji: \textit{Intel Pentium T3400 (2 cores). Taktován na 2.16~GHz s~1~MB cache}.
 Měření času CPU probíhalo v knihovně $timeit$ s několika násobným průchodem pro menší instance.
 
-Na grafu \ref{fig:1} můžeme vidět závislost výpočetního času metody hrubou silou na velikosti instance. Graf \ref{fig:1} ukazuje, že výpočetní náročnost je exponenciálně závislá na velikosti instance n. Křivka tedy přímo kopíruje exponenciálu. Graf tedy ukázal předpoklad z rozboru řešení. Na grafu je také vidět, že řešení jedné instance velikosti 35, trvalo průměrně kolem 1350 minut. Z tohoto důvodu jsem skončil s řešení instance o velikosti 35. Toto omezení ale nemělo velký vliv, protože i~s~ním je exponencíální průběh jasně patrný.
-
-Na obrázku \ref{fig:2} Můžeme vidět závislost výpočetního času medoty výpočtu pomocí heuristiky na velikosti instance. Na grafu \ref{fig:2} je vidět  téměř lineární závislost na velikosti vstupní instance n. Tato závislost je tedy ještě výnasobena $log(n)$ pro řadící algoritmus pro pole s poměry. Tento graf tedy opět potvrdil předpoklad.
-\begin{figure}\centering
-	\includegraphics[scale=0.25]{img/boxBB}
- 	\caption[3]{Řešení pomocí heuristiky. Velikost relativní chyby.}\label{fig:3}
+\begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/tBavg}
+ 	\caption[1]{Brute-force ve srovnání s dynamickým programováním s dekompozicí podle ceny. Časová náročnost. Na grafu jsou průměrné hodnoty.}\label{fig:1}
  \end{figure} 	
-Měření relativní cyby jsem prováděl podle postupu popsaného v~kapitole~\ref{kap:1}. Na grafu \ref{fig:3} jsou zobrazeny křivky pro maximální a~průměrnou relativní chyby řešení pomocí heuristiky. Je jasně patrné, že chyba klesá se zvětšující se instancí. 
 
-S zvětšující se instancí také klesá rozdíl mezi průměrnou a maximální chybou. Řešení pomocí heuristiky tedy může být využito k řešení velkých instancí, které nejsou upočitatelné metodou hrubé síly. Možnost menšího rozdílu mezi maximální a průměrnou chybou, která je patrná může být způsobena různými faktory. Například, že se již nevyskytují takové instance, pro které vykazuje onu vysokou chybu. Nebo také například, že pro takto velké instance je těžké tyto instance najít. 
+\subsection{Srovnání exaktních metod pro řešení problému batohu}
+Na grafu \ref{fig:1} jsem zanesl kromě brute-force řešení také řešení dekompozicí podle ceny. Je patrné, že složitost řešení s roustoucím $n$ pro brute-force metodu roste velice rychle narozdíl od dynamického programování. 
 
+
+\begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/tDavg}
+ 	\caption[2]{Časová náročnost obou způsobů dynamického programování, metody branch and bound a jednoduché heuristiky z předchozího úkolu. Na grafu jsou průměrné hodnoty.}\label{fig:2}
+ \end{figure} 	
+ \begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/tD50}
+ 	\caption[2]{Časová náročnost obou způsobů dynamického programování, metody branch and bound a jednoduché heuristiky z předchozího úkolu. Na grafu jsou hodnoty mediánu.}\label{fig:3}
+ \end{figure} 	
+
+
+Na dalším grafu jsem do grafu zanesl obě dekompozice, metodu větví a hranic a také heuristiku cena/hmotnost pro srovnání. Grafy \ref{fig:2} a \ref{fig:3} jsem vytvořil pro průměřnou hodnotu a pro medián. Z grafu je patrné, že hodnoty pro průměr se velice liší a pro n 27 to evokuje, že se zde náchazení instance problému, pro které je výpočet složitý. Z tohoto důvodu jsme se rozhodl vytvořit krabicové grafy (box ploty). Grafy zobrazují data podle kvartilů. Střední část je ohraničená 1. a 3. kvartilem. Jednotlivé body jsou odlehlé hodnoty. Celkově lze z box plotů vyčíst variabilitu dat. 
+
+Všechny boxploty jsou vytvořeny s logaritmickým časem pro lepší vizualizace, který nemá vliv na variabilitu dat.
+
+Na grafu \ref{fig:4} je vidět box plot vytvořený pro časy brute force řešení. Je vidět, že výsledné hodnoty jsou blízko u sebe, tedy očekávaná je i nízka variance dat. 
+
+\begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/boxB}
+ 	\caption[2]{Krabicový graf popisující variabilitu měření metody hrubé síly vždy pro 50 instancí problému.}\label{fig:4}
+ \end{figure} 		
+
+Dalš dva grafy \ref{fig:5} a \ref{fig:6} jsou výsledky z měření dynamického programování. Jedna je podle ceny a druhá podle kapacity. Zde je opět, že na daných 50 instancích je dekompozice podle kapacity rychlejší než dekompozice podle ceny. Tato závislost již byla vidět na předchozích grafech s průměrem a mediánem hodnot. Zajímavější ovšem jsou body, které jsou vidět nad jednotlivými boxy. Tyto odlehlé hodnoty jsou "těžké" instance problému, pro které trval výpočet dlouho oproti obvyklé době. Dalšími měřeními by bylo zajímavé zjistit, jaké specifikace má problém, který je pro dekompozici složitý.
+
+\begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/boxDW}
+ 	\caption[2]{Krabicový graf popisující variabilitu měření metody dekompozice podle kapacity vždy pro 50 instancí problému.}\label{fig:5}
+ \end{figure} 	
+ \begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/boxDC}
+ 	\caption[2]{Krabicový graf popisující variabilitu měření metody dekompozice podle ceny vždy pro 50 instancí problému.}\label{fig:6}
+ \end{figure}
+
+Na grafu \ref{fig:7} je vidět boxplot pro metodu větví a hranic. I zde se nacházejí těžké instance problému. Dále je z grafu patná větší variance časů řešení, kde pro nějaké problémy je metoda velice rychlá, ale existuje mnoho instancí, ve kterých nedojde k požadovanému prořezání. Opět by bylo zajímavé najít tyto optížné instance a nebo je umět například generovat.
+
+I přes horší časy dynamického programování má výhodu, že má výhodu v mnohem menší variabilitu časů.
+
+\begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/boxBB}
+ 	\caption[2]{Krabicový graf popisující variabilitu měření metody větví a hranic vždy pro 50 instancí problému.}\label{fig:7}
+ \end{figure} 	
+
+\subsection{FPTAS meření času}
+
+FPTAS jsem otestovals s různými nastaveními pro maximální povolenou chybu. Zde jsem časové grafy uvedl opět jak pro průměr, tak pro medián. Je vidět, že výsledný čas se přesně odvíjí od nastavené chyby. Velkou výhodou algoritmu je tedy možost nastavení maximální chyby.
+
+Na grafech \ref{fig:8} a \ref{fig:9} jsou vidět výsledky měření pro různá $\epsilon$ a do grafu byly pro srovnání přidány metody dekompozice podle ceny a metoda větví a hranic. Je vidět, že zmenou parametru lze jednoduše měnit výpočetní náročnost.
+
+ \begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/FPTASavg}
+ 	\caption[2]{Časová náročnost pro různé volby $\epsilon$ v FPTAS ve srovnání s dekompozicí a metodou branch and bound. Hodnoty jsou uvedeny pro průmer.}\label{fig:8}
+ \end{figure} 	
+ \begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/FPTAS50}
+ 	\caption[2]{Časová náročnost pro různé volby $\epsilon$ v FPTAS ve srovnání s dekompozicí a metodou branch and bound. Hodnoty jsou uvedeny pro medián.}\label{fig:9}
+ \end{figure} 	
+ 
+Na těchto měření jsou také zajímavé boxploty. Například pro $\epsilon=0.5$ na grafu \ref{fig:10} se zde stále vyskytují dané "těžké" problémy. Ale při volbě $\epsilon=0.95$ na grafu \ref{fig:11} se již pro $n=27$ daný problém nevyskytuje a tento skok bude patrný i na grafu závislosti $\epsilon$ a času. Tedy aproximační schéma dokázalo problém dostatečně zjednodušit pro rychlé řešení. Toto je nejvíce patrné pro $\epsilon=0.99$ na grafu \ref{fig:12}. V těchto případech nám však algoritmus již negarantuje dobré relativní chyby.
+ 
+ \begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/boxF50}
+ 	\caption[2]{Krabicový graf popisující variabilitu měření metody FPTAS $\epsilon = 0.5$ vždy pro 50 instancí problému.}\label{fig:11}
+ \end{figure} 	
+ \begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/boxF95}
+ 	\caption[2]{Krabicový graf popisující variabilitu měření metody FPTAS $\epsilon = 0.95$ vždy pro 50 instancí problému.}\label{fig:10}
+ \end{figure} 	
+ \begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/boxF99}
+ 	\caption[2]{Krabicový graf popisující variabilitu měření metody FPTAS $\epsilon = 0.99$ vždy pro 50 instancí problému.}\label{fig:12}
+ \end{figure} 	
+
+Na dalším grafu jsem zobrazil závislost časové složistosti na velikosti povolené chyby. Zde jsem uvedl graf \ref{fig:13} této závisloti na velikosti instance 25. Na dalším grafu \ref{fig:14} je stejná závislost pro velikost instance 27, kde došlo k aproximování těžkých problémů pro vysoké hodnoty $\epsilon$.
+ 
+\begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/FPTASTimeEPS25}
+ 	\caption[2]{Graf ukazující závislost výpočetního času a zvolené maximální chyby $\epsilon$ pro velikost instance 25.}\label{fig:13}
+ \end{figure} 	
+ \begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/FPTASTimeEPS27}
+ 	\caption[2]{Graf ukazující závislost výpočetního času a zvolené maximální chyby $\epsilon$ pro velikost instance 25.}\label{fig:14}
+ \end{figure} 	 
+ 
+\subsection{FPTAS meření relativní chyby} 
+ Na grafu \ref{fig:15} je vidět závislost maximální chyby pro různě zvolenou maximální chybu v algoritmu FPTAS. Meřená chyba nikdy nepřekonala stanovenou maximální chybu. Na dalším grafu \ref{fig:16} je nejvyšší hodnota z grafu \ref{fig:15} dána do srovnání s heuristikou cena/hmotnost. Zde je vidět, že heuristika i pro zvolenou obrovskou maximální chybu, vykazuje vetší chybu než algoritmus FPTAS pro instance v testovací sadě. Na posledním grafu \ref{fig:17} je vidět závislos maximální chyby na $\epsilon$ pro vybraná $n$. Je vidět, že skutečná chyba je mnohem menší než předpokládaná maximální relativní chyba.
+ 
+ \begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/errorFPTAS}
+ 	\caption[2]{Graf ukazující závislost maximální relativní chyby na velikosti instance pro několik zvolených maximálních chyb $\epsilon$.}\label{fig:15}
+ \end{figure} 	
+ \begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/error}
+ 	\caption[2]{Graf ukazující závislost maximální relativní chyby na velikosti instance pro vybranou maximální chybu ve srovnání s chybou heuristiky cena/hmotnost.}\label{fig:16}
+ \end{figure} 	 
+ \begin{figure}[h]\centering
+	\includegraphics[scale=0.2]{img/FPTASerrEPS}
+ 	\caption[2]{Graf ukazující závislost relativní chyby a zvolené maximální chyby $\epsilon$ pro vybrané velikosti instance.}\label{fig:17}
+ \end{figure} 	 	 
  
 \section{Závěr}
-V průběhu experimetu jsme si prakticky ověřili předpoklady a řešení problému batohu pomocí hrubé síly a jednoduchou heuristikou. Rozdíl mezi těmito metodami se podle vykonaných experimentů snižuje s velikostí instance. Experimenty pro každé n byly vykonány na 50 instancích problému. Pokud instance byli generovány přijatelně náhodně je možné předpokládat, že by toto chování metody vykazovali i pro další instance. 
+Během měření se podařilo zjistit, metody B\&B a dynamického programování dosahují velkého rozdílu ve složitosti oproti metodě hrubé síly. Dále, že dekompozice podle kapacity dosahuje nižších časů než dekompozice podle ceny. Metody dynamického programování mění složitost, která již není závislá exponenciálně na počtu předmětů, ale je ovlivněna hodnotami dané instance.
 
-I přes předpoklad exponenciální složitosti mě při řešení nárůst výpočetního času překvapil a~s~využitím pomalejšího programovacího jazyka a staršího stroje, který složí již jen jako datový server, trvalo měření velice dlouho. 
+ Avšak z exaktních metod byla nejrychlejší metody větví a hranic (která by mela mít stále exponenciální složitost), ale táké tato metoda měla velký rozptyl meřených časů pro různé instance. Při přistích experimentech by bylo zajímavé metody dynamického programování vylepšit o metody B\&B a zkusit naměřit výsledky.
 
-Na druhou stranu mě pozitivně překvapila heuristika, která vykazovala minimální přůměřnou aproximační chybu a je tedy pro velké intance použitelná.
+Při měření jsem také narazil na fakt, že pro testované metody existují instance pro, které trvá výpočet velmi dlouho. Pro různé instance tedy může být optimální jiný algoritmus, který jí vyřeší rychleji nebo algoritmus, který ji vyřeší s minimální chybou.
+
+Plně polynomiální aproximační schéma FPTAS bylo zajímávé v tom, že jsme mohli měnit maximální povolenou relativní chybu a tím ovlivňovat časovou náročnost. Proto při volbě tohoto algoritmu je důležité zvážit požadavky na chybu a na rychlost a zvolit správné nastavení.
+
+
 
 \end{document}
