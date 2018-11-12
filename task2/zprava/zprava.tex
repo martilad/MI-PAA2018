@@ -54,9 +54,9 @@ Všechna měření jsou vždy prováděna i s předzpracováním. Jediné co alg
 Metodu větví a hranic jsem implementoval do rekurze a při každém přidání předmětu je kontrolováno zdali řešení nepřekročilo maximální váhu a nebo zdali může překonat prozatimní nejlepší řešení. Součet zbývajících cen provádím při každé kontrole. Tento krok by mohl být zrychlen předpočítáním jednotlivých součtů do pole vždy pro $x$ přeskočených hodnot. 
 
 \subsection{Dynamické programování}
-Zde jsem implementoval obě dekompozice. V dekompozici podle kapacity vytvořím pole pomocí numpy o velikosti $(n+1)*(\text{kapacita batohu} + 1)$ a inicializované nulami. V každém kroku do dané buňku ukládám aktuální dosaženou cenu, pokud již v buňce cena je a je vyšší můžu tuto větev odříznout.
+Zde jsem implementoval obě dekompozice. V dekompozici podle kapacity vytvořím pole pomocí numpy o velikosti $(n+1)*(\text{kapacita batohu} + 1)$ a inicializované nulami. V každém kroku do dané buňku ukládám aktuální dosaženou cenu, pokud již v buňce cena je a je vyšší, oříznu tuto větev.
 
-V dekompozici podle ceny vytvořím pole o velikosti $(n+1)*(\text{součet cen} + 1)$ a inicializované maximální hodnotou. V každém kroku do dané buňku ukládám aktuální dosaženou kapacitu, pokud již v buňce hodnota je a je nižší můžu tuto větev odříznout.
+V dekompozici podle ceny vytvořím pole o velikosti $(n+1)*(\text{součet cen} + 1)$ a inicializované maximální hodnotou. V každém kroku do dané buňku ukládám aktuální dosaženou kapacitu, pokud již v buňce hodnota je a je nižší, oříznu tuto větev.
 
 Rekonstrukci řešení provedu zpětně od optimálního, tak že se koukám do vedlejší buňky zdali je hodnota stejná, pokud ano předmět na dané pozici nebyl přídán a pokud ne posunu se v tabulce a patřičný počet kroků a předmět přidám.
 
@@ -76,31 +76,28 @@ Měření času CPU probíhalo v knihovně $timeit$ s několika násobným průc
  \end{figure} 	
 
 \subsection{Srovnání exaktních metod pro řešení problému batohu}
-Na grafu \ref{fig:1} jsem zanesl kromě brute-force řešení také řešení dekompozicí podle ceny. Je patrné, že složitost řešení s roustoucím $n$ pro brute-force metodu roste velice rychle narozdíl od dynamického programování. 
+Na grafu \ref{fig:1} jsem zanesl kromě brute-force řešení také řešení dekompozicí podle ceny. Je patrné, že složitost řešení s roustoucím $n$ pro brute-force metodu roste velice rychle,tedy řešení pomocí dynamického programování umožní velice uspořit čas. 
 
 
 \begin{figure}[h]\centering
 	\includegraphics[scale=0.2]{img/tDavg}
  	\caption[2]{Časová náročnost obou způsobů dynamického programování, metody branch and bound a jednoduché heuristiky z předchozího úkolu. Na grafu jsou průměrné hodnoty.}\label{fig:2}
  \end{figure} 	
- \begin{figure}[h]\centering
-	\includegraphics[scale=0.2]{img/tD50}
- 	\caption[2]{Časová náročnost obou způsobů dynamického programování, metody branch and bound a jednoduché heuristiky z předchozího úkolu. Na grafu jsou hodnoty mediánu.}\label{fig:3}
- \end{figure} 	
+ 
 
-
-Na dalším grafu jsem do grafu zanesl obě dekompozice, metodu větví a hranic a také heuristiku cena/hmotnost pro srovnání. Grafy \ref{fig:2} a \ref{fig:3} jsem vytvořil pro průměřnou hodnotu a pro medián. Z grafu je patrné, že hodnoty pro průměr se velice liší a pro n 27 to evokuje, že se zde náchazení instance problému, pro které je výpočet složitý. Z tohoto důvodu jsme se rozhodl vytvořit krabicové grafy (box ploty). Grafy zobrazují data podle kvartilů. Střední část je ohraničená 1. a 3. kvartilem. Jednotlivé body jsou odlehlé hodnoty. Celkově lze z box plotů vyčíst variabilitu dat. 
+Na dalším grafu \ref{fig:2} jsem do grafu zanesl obě dekompozice, metodu větví a hranic a také heuristiku cena/hmotnost pro srovnání. 
+U těchto metod mě velice zajímalo jaká je variance řešení. Pří porovnání průměrů a mediánu, byl v datech velký rozdíl. Z tohoto důvodu jsme se rozhodl vytvořit krabicové grafy (box ploty). Grafy zobrazují data podle kvartilů. Střední část je ohraničená 1. a 3. kvartilem. Jednotlivé body jsou odlehlé hodnoty. Celkově lze z box plotů vyčíst variabilitu dat. 
 
 Všechny boxploty jsou vytvořeny s logaritmickým časem pro lepší vizualizaci, který však nemá vliv na variabilitu dat.
 
-Na grafu \ref{fig:4} je vidět box plot vytvořený pro časy brute-force řešení. Je vidět, že výsledné hodnoty jsou blízko u sebe, tedy očekávaná je i nízka variance dat. 
+Na grafu \ref{fig:4} je vidět box plot vytvořený pro časy brute-force řešení. Je vidět, že výsledné hodnoty jsou blízko u sebe, tedy očekávaná je i nízka variance při výpočtu na různých instancí dat. 
 
 \begin{figure}[h]\centering
 	\includegraphics[scale=0.2]{img/boxB}
  	\caption[2]{Krabicový graf popisující variabilitu měření metody hrubé síly vždy pro 50 instancí problému.}\label{fig:4}
  \end{figure} 		
 
-Dalš dva grafy \ref{fig:5} a \ref{fig:6} jsou výsledky z měření dynamického programování. Jak pro dekompozici podle ceny, tak i podle kapacity. Zde je vidět, že na daných 50 instancích pro každé n je dekompozice podle kapacity rychlejší než dekompozice podle ceny. Tato závislost již byla vidět na předchozích grafech s průměrem a mediánem hodnot. Zajímavější ovšem jsou body, které jsou vidět nad jednotlivými boxy. Tyto odlehlé hodnoty jsou "těžké" instance problému, pro které trval výpočet dlouho oproti obvyklé době. Dalšími měřeními by bylo zajímavé zjistit, jaké specifikace má problém, který je pro dekompozici složitý.
+Další dva grafy \ref{fig:5} a \ref{fig:6} jsou výsledky z měření dynamického programování. Jak pro dekompozici podle ceny, tak i podle kapacity. Na tomto grafu jsou zajímavé body, které jsou vidět nad jednotlivými boxy. Tyto odlehlé hodnoty jsou "těžké" instance problému, pro které trval výpočet dlouho oproti obvyklé době. Je vidět, že výpočet na těchno instancích trvá velmi dlouho. Dalšími měřeními by bylo zajímavé zjistit, jaké specifikace má problém, který je pro dekompozici složitý.
 
 \begin{figure}[h]\centering
 	\includegraphics[scale=0.2]{img/boxDW}
@@ -113,7 +110,7 @@ Dalš dva grafy \ref{fig:5} a \ref{fig:6} jsou výsledky z měření dynamickéh
 
 Na grafu \ref{fig:7} je vidět boxplot pro metodu větví a hranic. I zde se nacházejí těžké instance problému. Dále je z grafu patná větší variance časů řešení, kde pro nějaké problémy je metoda velice rychlá, ale existuje mnoho instancí, ve kterých nedojde k požadovanému prořezání. Opět by bylo zajímavé najít tyto optížné instance a nebo je umět například generovat.
 
-I přes horší časy má dynamického programování výhodu, že má mnohem menší variabilitu časů.
+I přes horší časy při experimentech má dynamického programování výhodu, že má mnohem menší varianci výpočetních časů.
 
 \begin{figure}[h]\centering
 	\includegraphics[scale=0.2]{img/boxBB}
@@ -122,7 +119,7 @@ I přes horší časy má dynamického programování výhodu, že má mnohem me
 
 \subsection{FPTAS meření času}
 
-FPTAS jsem otestoval s různými nastaveními pro maximální povolenou chybu. Zde jsem časové grafy uvedl opět jak pro průměr, tak pro medián. Je vidět, že výsledný čas se přesně odvíjí od nastavené chyby. Velkou výhodou algoritmu je tedy možost nastavení maximální chyby.
+FPTAS jsem otestoval s různými nastaveními pro maximální povolenou chybu. Zde jsem časové grafy uvedl jak pro průměr, tak pro medián, po předchozím pozorování na krabicových grafech. Je vidět, že výsledný čas se přesně odvíjí od nastavené chyby. Velkou výhodou algoritmu je tedy možost nastavení maximální chyby.
 
 Na grafech \ref{fig:8} a \ref{fig:9} jsou vidět výsledky měření pro různá $\epsilon$ a do grafu byly pro srovnání přidány metody dekompozice podle ceny a metoda větví a hranic. Je vidět, že změnou parametru lze jednoduše měnit výpočetní náročnost.
 
@@ -135,7 +132,7 @@ Na grafech \ref{fig:8} a \ref{fig:9} jsou vidět výsledky měření pro různá
  	\caption[2]{Časová náročnost pro různé volby $\epsilon$ v FPTAS ve srovnání s dekompozicí a metodou branch and bound. Hodnoty jsou uvedeny pro medián.}\label{fig:9}
  \end{figure} 	
  
-Na těchto měření jsou také zajímavé boxploty. Například pro $\epsilon=0.5$ na grafu \ref{fig:10} se zde stále vyskytují dané "těžké" problémy. Ale při volbě $\epsilon=0.95$ na grafu \ref{fig:11} se již pro $n=27$ daný problém nevyskytuje a tento skok bude patrný i na grafu závislosti $\epsilon$ a času. Tedy aproximační schéma dokázalo problém dostatečně zjednodušit pro rychlé řešení avšak na úkor negarantování nějaké přiměřené hranice chyby. Toto je nejvíce patrné pro $\epsilon=0.99$ na grafu \ref{fig:12}. V těchto případech nám však algoritmus již negarantuje přijatelnou relativní chybu.
+Na těchto měření jsou také zajímavé krabicové grafy. Například pro $\epsilon=0.5$ na grafu \ref{fig:10} se zde stále vyskytují dané "těžké" problémy. Ale při volbě $\epsilon=0.95$ na grafu \ref{fig:11} se již pro $n=27$ daný problém nevyskytuje a tento skok bude patrný i na grafu závislosti $\epsilon$ a času. Tedy aproximační schéma dokázalo problém dostatečně zjednodušit pro rychlé řešení avšak na úkor negarantování nějaké přiměřené hranice chyby. Toto je nejvíce patrné pro $\epsilon=0.99$ na grafu \ref{fig:12}. V těchto případech nám však algoritmus již negarantuje přijatelnou relativní chybu.
  
  \begin{figure}[h]\centering
 	\includegraphics[scale=0.2]{img/boxF50}
