@@ -132,7 +132,7 @@ Na grafech \ref{fig:8} a \ref{fig:9} jsou vidět výsledky měření pro různá
  	\caption[2]{Časová náročnost pro různé volby $\epsilon$ v FPTAS ve srovnání s dekompozicí a metodou branch and bound. Hodnoty jsou uvedeny pro medián.}\label{fig:9}
  \end{figure} 	
  
-Na těchto měření jsou také zajímavé krabicové grafy. Například pro $\epsilon=0.5$ na grafu \ref{fig:10} se zde stále vyskytují dané "těžké" problémy. Ale při volbě $\epsilon=0.95$ na grafu \ref{fig:11} se již pro $n=27$ daný problém nevyskytuje a tento skok bude patrný i na grafu závislosti $\epsilon$ a času. Tedy aproximační schéma dokázalo problém dostatečně zjednodušit pro rychlé řešení avšak na úkor negarantování nějaké přiměřené hranice chyby. Toto je nejvíce patrné pro $\epsilon=0.99$ na grafu \ref{fig:12}. V těchto případech nám však algoritmus již negarantuje přijatelnou relativní chybu.
+Na těchto měření jsou také zajímavé krabicové grafy. Například pro $\epsilon=0.5$ na grafu \ref{fig:11} se zde stále vyskytují dané "těžké" problémy. Ale při volbě $\epsilon=0.95$ na grafu \ref{fig:10} se již pro $n=27$ daný problém nevyskytuje a tento skok bude patrný i na grafu závislosti $\epsilon$ a času. Tedy aproximační schéma dokázalo problém dostatečně zjednodušit pro rychlé řešení avšak na úkor negarantování nějaké přiměřené hranice chyby. Toto je nejvíce patrné pro $\epsilon=0.99$ na grafu \ref{fig:12}. V těchto případech nám však algoritmus již negarantuje přijatelnou relativní chybu.
  
  \begin{figure}[h]\centering
 	\includegraphics[scale=0.2]{img/boxF50}
@@ -159,7 +159,7 @@ Na dalším grafu jsem zobrazil závislost časové složistosti na velikosti po
  \end{figure} 	 
  
 \subsection{FPTAS meření relativní chyby} 
- Na grafu \ref{fig:15} je vidět závislost maximální chyby pro různě zvolenou maximální chybu v algoritmu FPTAS. Meřená chyba nikdy nepřekonala stanovenou maximální chybu. Na dalším grafu \ref{fig:16} je nejvyšší hodnota z grafu \ref{fig:15} dána do srovnání s heuristikou cena/hmotnost. Zde je vidět, že heuristika i pro zvolenou velkou maximální chybu FPTAS, vykazuje vetší chybu než algoritmus FPTAS pro instance v testovací sadě. Na posledním grafu \ref{fig:17} je vidět závislost maximální chyby na $\epsilon$ pro vybraná $n$. Je vidět, že skutečná chyba je mnohem menší než předpokládaná maximální relativní chyba.
+ Na grafu \ref{fig:15} je vidět závislost maximální chyby pro různě zvolenou maximální chybu v algoritmu FPTAS pro měřená n. Meřená chyba nikdy nepřekonala stanovenou maximální chybu. Na dalším grafu \ref{fig:16} je nejvyšší hodnota z grafu \ref{fig:15} dána do srovnání s heuristikou cena/hmotnost. Zde je vidět, že heuristika vykazuje vetší chybu než algoritmus FPTAS i pro zvolenou velkou maximální chybu algoritmu, která nám negarantuje témeř nic. Na posledním grafu \ref{fig:17} je vidět závislost maximální chyby na $\epsilon$ pro vybraná $n$. Je opravdu vidět, že skutečná chyba je mnohem menší než předpokládaná maximální relativní chyba.
  
  \begin{figure}[h]\centering
 	\includegraphics[scale=0.2]{img/errorFPTAS}
@@ -177,9 +177,9 @@ Na dalším grafu jsem zobrazil závislost časové složistosti na velikosti po
 \section{Závěr}
 Během měření se podařilo zjistit, metody B\&B a dynamického programování dosahují velkého rozdílu ve složitosti oproti metodě hrubé síly. Dále, že dekompozice podle kapacity dosahuje nižších časů než dekompozice podle ceny. Metody dynamického programování mění složitost, která již není závislá exponenciálně na počtu předmětů, ale je ovlivněna hodnotami dané instance.
 
- Avšak z exaktních metod byla nejrychlejší metoda větví a hranic (měla by mít stále exponenciální složitost), ale také tato metoda měla velký rozptyl meřených časů pro různé instance. Při přištích experimentech by bylo zajímavé metody dynamického programování vylepšit o metody B\&B a zkusit naměřit výsledky.
+ Podle měření byla z exaktních metod nejrychlejší metoda větví a hranic (měla by mít stále exponenciální složitost). Tato metoda však měla velký rozptyl meřených časů pro různé instance. Při přištích experimentech by bylo zajímavé metody dynamického programování vylepšit o metody B\&B a zkusit naměřit výsledky.
 
-Při měření jsem také narazil na fakt, že pro testované metody existují instance, pro které trvá výpočet velmi dlouho. Pro různé instance tedy může být optimální jiný algoritmus, který jí vyřeší rychleji nebo algoritmus, který ji vyřeší s minimální chybou.
+Při měření jsem také narazil na fakt, že pro testované metody existují instance, pro které trvá výpočet velmi dlouho tvz. těžké instance. Pro různé instance tedy může být optimální jiný algoritmus, který jí vyřeší rychleji nebo algoritmus, který ji vyřeší s minimální chybou.
 
 Plně polynomiální aproximační schéma FPTAS bylo zajímávé v tom, že jsme mohli měnit maximální povolenou relativní chybu a tím ovlivňovat časovou náročnost. Proto při volbě tohoto algoritmu je důležité zvážit požadavky na chybu a na rychlost a zvolit správné nastavení.
 
