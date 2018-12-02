@@ -1,41 +1,49 @@
 #!/bin/sh
 
-
-python3 task3.py stats --outfile='S_G05M.csv' -p'inst/_G05.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '19/25' > log.log
-
-python3 task3.py stats --outfile='S_G10M.csv' -p'inst/_G10.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '20/25' > log.log
-
-python3 task3.py stats --outfile='S_G15M.csv' -p'inst/_G15.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '21/25' > log.log
-
-python3 task3.py stats --outfile='S_G20M.csv' -p'inst/_G20.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '22/25' > log.log
-
-python3 task3.py stats --outfile='S_G25M.csv' -p'inst/_G25.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '23/25' > log.log
-
-python3 task3.py stats --outfile='S_G30M.csv' -p'inst/_G30.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '24/25' > log.log
-
-
-python3 task3.py stats --outfile='S_G05V.csv' -p'inst/_G05V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '19/25' > log.log
-
-python3 task3.py stats --outfile='S_G10V.csv' -p'inst/_G10V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '20/25' > log.log
-
-python3 task3.py stats --outfile='S_G15V.csv' -p'inst/_G15V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '21/25' > log.log
-
-python3 task3.py stats --outfile='S_G20V.csv' -p'inst/_G20V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '22/25' > log.log
-
-python3 task3.py stats --outfile='S_G25V.csv' -p'inst/_G25V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '23/25' > log.log
-
-python3 task3.py stats --outfile='S_G30V.csv' -p'inst/_G30V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
-echo '24/25' > log.log
+python3 task3.py stats --outfile='05.G.M.csv' -p'inst/05.G.M.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='05.G.V.csv' -p'inst/05.G.V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='05.m.csv' -p'inst/05.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='10000.C.csv' -p'inst/10000.C.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='10000.W.csv' -p'inst/10000.W.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='1000.C.csv' -p'inst/1000.C.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='1000.W.csv' -p'inst/1000.W.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='100.m.csv' -p'inst/100.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='10.G.M.csv' -p'inst/10.G.M.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='10.G.V.csv' -p'inst/10.G.V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='10.m.csv' -p'inst/10.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='15.G.M.csv' -p'inst/15.G.M.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='15.G.V.csv' -p'inst/15.G.V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='2000.C.csv' -p'inst/2000.C.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='2000.W.csv' -p'inst/2000.W.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='200.C.csv' -p'inst/200.C.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='200.W.csv' -p'inst/200.W.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='20.G.M.csv' -p'inst/20.G.M.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='20.G.V.csv' -p'inst/20.G.V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='20.m.csv' -p'inst/20.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='25.G.M.csv' -p'inst/25.G.M.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='25.G.V.csv' -p'inst/25.G.V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='3000.C.csv' -p'inst/3000.C.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='3000.W.csv' -p'inst/3000.W.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='30.C.csv' -p'inst/30.C.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='30.G.M.csv' -p'inst/30.G.M.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='30.G.V.csv' -p'inst/30.G.V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='30.m.csv' -p'inst/30.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='30.W.csv' -p'inst/30.W.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log 
+python3 task3.py stats --outfile='35.G.M.csv' -p'inst/35.G.M.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='35.G.V.csv' -p'inst/35.G.V.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='4000.C.csv' -p'inst/4000.C.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='4000.W.csv' -p'inst/4000.W.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='400.C.csv' -p'inst/400.C.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='400.W.csv' -p'inst/400.W.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='40.m.csv' -p'inst/40.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='5000.C.csv' -p'inst/5000.C.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='5000.W.csv' -p'inst/5000.W.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='4000.C.csv' -p'inst/4000.C.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='50.m.csv' -p'inst/50.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='60.m.csv' -p'inst/60.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='70.m.csv' -p'inst/70.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='80.m.csv' -p'inst/80.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='90.m.csv' -p'inst/90.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
+python3 task3.py stats --outfile='95.m.csv' -p'inst/95.m.inst.dat' -h -bb -dc -dw  > log.log 2> elog.log
 
 
