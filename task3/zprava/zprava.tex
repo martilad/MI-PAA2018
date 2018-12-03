@@ -63,21 +63,74 @@ Všechny algoritmy a průběh experimentu, zůstali stejné jako v úloze 2. Byl
 
 \section{Experimenty}
  
+ 
+\begin{figure}
+	\centering
+    \begin{minipage}[c]{0.49\textwidth}
+        \centering\includegraphics[width=\textwidth]{img/GVE.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.49\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/GVH.pdf} 
+    \end{minipage}
+    \\
+   \caption{Na grafech je zobrazena časová náročnost jednotlivých medod v závislosti na granularitě instance. Zde jsou uvedeny grafy pro převahu velkých instancí, kde k je exponent z generátoru náhodných instancích, který určuje pravděpodobnost přijetí daného předmětu.}\label{fig:GVI}
+    \end{figure} 
+    
+    \begin{figure}
+	\centering
+    \begin{minipage}[c]{0.49\textwidth}
+        \centering\includegraphics[width=\textwidth]{img/GME.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.49\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/GMH.pdf} 
+    \end{minipage}
+    \\
+   \caption{Na grafech je zobrazena časová náročnost jednotlivých medod v závislosti na granularitě instance. Zde jsou uvedeny grafy pro převahu malých instancí, kde k je exponent z generátoru náhodných instancích, který určuje pravděpodobnost přijetí daného předmětu.}\label{fig:GMI}
+    \end{figure} 
+ 
+
+ 
+ 
 Experimenty jsem prováděl v režimu jednoho vlákna na starším datovém serveru v podobě starého notebooku, který v době výpočtu nebyl používán. Výsledky tedy nejsou ovlivněny jinými běžícími programy. Procesor na testovacím stroji: \textit{Intel Pentium T3400 (2 cores). Taktován na 2.16~GHz s~1~MB cache}.
-Měření času CPU probíhalo v knihovně $timeit$ s několika násobným průchodem pro menší instance. Pro každý parametr bylo vygenerováno 100 instancí.
+Měření času CPU probíhalo v knihovně $timeit$ s tidíci násobným průchodem pro jednotlivá měření pro přesnost měření.
+
+Pro každý parametr bylo vygenerováno 100 instancí o počtu předmětů 27. Na grafech jsem vždy rozdělil exaktní metody a heuristiku z důvodu nízkých časů u heuristiky, u které by nebyly rozdíly s exaktními metodami vůbec ukázatelné. 
 
 
+\subsection{Závislost na granularitě instance}
+První jsem se podíval na granularitu instancí. Ta je řízena následovně. V generátoru je možno ovlivnit, zda instance bude obsahovat spíše malé nebo spíše velké věci. Pro převahu malých věcí je pravděpodobnost $p$, že věc s váhou $w$ bude v instanci zahrnuta $$ p=\frac{1 }{ w^k}$$. Kde $k$ je volitelný exponent. Pro převahu velkých věcí platí symetrický vztah $$ p=\frac{1}  {(w_{max}-w)^k}$$.
 
+Na grafu \ref{fig:GVI} můžeme vidět porovnání pro převahu velkých věcí. Lze vidět, že pro metody větví a hranic je zde jasně patrný trend. S větším počtem velkých předmětů tedy roste její výpočetní náročnost. Tento trend, avšak ne tak patný, může být pozorován i na jednotlivých dekompozicích. 
 
+Na grafu \ref{fig:GMI} vidíme porovnání pro převahu malých věcí. I zde jsou patrné citlivosti jednotlivých exaktních metod. Ale mírně odlišně než u převahy velkých věcí. U metody větví a hranic je stále s převahou menších instancí roste její časová náročnost. Naopak u dekompozicích tento čas klesá. 
+
+Citlivost u dekompozic bych si také mohl vysvětlit jako citlivost na celkovou sumu váhy nebo ceny podle druhu dekompozice. Protože převaha velkých nebo malých předmětů tuto sumu ovlivní. Citlivost na tyto parametry prozkoumáme v další podkapitole.
+
+U heuristické metody na grafech můžeme fidět veliký rozptyl hodnot. Její závislost na granularitě se tady nepotvrdila. O této metodě bych tedy neřekl, že její výkonost ovlivní granularita jednotlivých instancí.
+
+Na grafech \ref{fig:GOEI} je ukázána průměrná a maximální chyba heuristické metody při změnách granularity instancí. Zde není patrná témě žádná závislost chyby na granularitě instance. Při podrobnější zkoumální hodnot maxim, by možná bylo možné říct, že maximální chyba klesá s převahou malých i velkých předmětů, ale tento trend by bylo nutné podrobněji prozkoumat a podrobit mnohem větší analýze.
+ 
+ \begin{figure}
+	\centering
+    \begin{minipage}[c]{0.49\textwidth}
+        \centering\includegraphics[width=\textwidth]{img/GMHE.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.49\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/GVHE.pdf} 
+    \end{minipage}
+    \\
+   \caption{Na grafech je ukázána vždy průměrná a maximální chyba heuristiky v závislosti na granularitě instance. Na levém grafu pro převahu malých instancí a na převém grafu pro převahu velkých instancí.}\label{fig:GOEI}
+    \end{figure} 
+    
 \subsection{Závislost na poměru součtu vah předmětů k nosnosti batohu}
 \subsection{Závislost na maximální ceně předmětů}
 \subsection{Závislost na maximální váze předmětů}
-\subsection{Závislost na granularitě instance}
+
 
 
 
 \begin{figure}[h]\centering
-	\includegraphics[scale=0.2]{img/tBavg}
+	\includegraphics[scale=0.2]{img/GMHE}
  	\caption[1]{Brute-force ve srovnání s dynamickým programováním s dekompozicí podle ceny. Časová náročnost. Na grafu jsou průměrné hodnoty.}\label{fig:1}
  \end{figure} 	
 
