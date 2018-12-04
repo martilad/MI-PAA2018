@@ -139,11 +139,11 @@ Na grafech \ref{fig:GOEI} je ukázána průměrná a maximální chyba heuristic
     \end{figure} 
     
 \subsection{Závislost na poměru součtu vah předmětů k nosnosti batohu}
-Pro tento parametr jsem očekával největší citlivost u metody větví a hranic. Tato citlivost se potvrdila a je patná na grafu \ref{fig:mI}. Je tedy zjevné, že metoda selhává v momentě, kdy se optimální řešení skládá z většího počtu předmětů. Také je na grafu vidět pád pro hodnotu 1. Tento jev je očekávaný z implementace. V rekurzivním volání se snažím předmět přidávat dokud nedojde k prořezu a v tomto případě končí po přidání všech předmětů.
+Pro tento parametr jsem očekával největší citlivost u metody větví a hranic. Tato citlivost se potvrdila a je patná na grafu \ref{fig:mI}. Je tedy zjevné, že metoda selhává v momentě, kdy se poměr pohybuje mezi hodnotami 0.2 - 0.5. Také je na grafu vidět minimální čas pro velké hodnoty a minimální čas pro hodnotu 1. Tento jev je očekávaný z implementace. V rekurzivním volání se snažím předmět přidávat dokud nedojde k prořezu a v tomto případě končí po přidání všech předmětů. Generovanéinstance se tedy skládaly z velkého množství předmětů a najít řešení bylo přímočařejší.
 
 Pro dynamické programování se výpočetní náročnost také zvyšuje. Toto může být způsobeno tím, že přestává být tak učínné prořezání a je nutné projít více větví rekurze.
 
-Pro heuristiku je také patrný trend, že výpočetní čas roste s poměrem, ale v tomto případě nejsou rozdíly v náročnosti tak velké.
+Pro heuristiku je také patrný trend, že výpočetní čas roste s poměrem, tedy roste náročnost této metody s poměrem. Zájímavý je tento výsledek ve srovnání s chybou.
 
 Pro chybu na grafu \ref{fig:mEI} je jasně patrný klesající trend, tedy že chyba je závislá na poměru sumární váhy ke kapacitě batohu. Čím výšší je poměr, tím menší je chyba, protože klesá i pravděpodobnost toho, že předmět nebude v řešení. Nulová chyba pro poměr 1 je očekávána, neboť jsou přídány všechny předmětu do batohu.
 
@@ -228,13 +228,13 @@ Na grafu \ref{fig:WCEI} vlevo je zobrazena relativní chyba v závislosti na par
 \section{Závěr}
 Během experimentu jsem otestoval velké množství instancí s různými parametry a sledoval citlivost algoritmů na tyto parametry. Byly pozorovány časy exaktních algoritmů a u heuristiky byla také měřena relativní chyba v závislosti na změnách konkrétních parametrů instancí. 
 
-Podle předpokladů se ukázala metoda větví a hranic citlivá na poměr sumy vah a kapacity batohu, se zvyšujícím se poměrem rostla náročnost a výpočetní složitost této metody. Až pro hodnotu 1 spadl čas na minimum, protože metoda přidá všechy předměty. Na tento poměr se také ukázala být citlivá heuristická metoda a to především co se týče relativní chyby, která klesala se snižujících se poměrem. 
+Podle předpokladů se ukázala metoda větví a hranic citlivá na poměr sumy vah a kapacity batohu, kde až do hodnoty 0.4 rostla výpočetní náročnost a poté až do 1 klesala. Až pro hodnotu 1 spadl čas na minimum, protože metoda přidá všechy předměty. Na tento poměr se také ukázala být citlivá heuristická metoda, výpočetní náročnost s poměrem narůstala a relativní chyba ta s rostoucím poměrem klesala. 
 
 V algoritmech se také projevuje nepatrně koeficient granularity, ale pouze minimálně. Na relativní chyby heuristiky vliv nemá. 
 
 Dále se projevila závislost jednotlivých dekompozicích vždy na parametru podle kterého je prováděna. Tato znalost by nám mohla při analýze problému pomoc vybrat správný algoritmus pro minimalizaci výpočetní náročnosti. 
 
-Velice zajímavé bylo oproti úkolu 2, že se metoda větví a hranic vykazovala větší náročnost než dynamické programování, oproti poznatku z úkolu 2 na referenčních instancí. Tento poznatek bych připsal zvolenému základnímu poměru součtu vah předmětů k nosnosti batohu. Ten činil 0.5 a tato metoda se na tento poměr ukázala velice citlivá.
+Velice zajímavé bylo oproti úkolu 2, že se metoda větví a hranic vykazovala větší náročnost než dynamické programování, oproti poznatku z úkolu 2 na referenčních instancí. Tento poznatek bych připsal zvolenému základnímu poměru součtu vah předmětů k nosnosti batohu. Ten činil 0.5 a tato metoda se na tento poměr ukázala velice citlivá. Pro hodnoty v určitém rozsahu její čas velice narůstal. Pokud by se v referenčních instancí nacházely takové, ktré mají poměr 0.4, tato medota by určitě tak dobře z předchozího testu nevyšla.
 
 Náměřené hodnoty však slouží pouze jako podpůrné argumety i přes větší množství instancí a velké množství opakování. Míra důvěry v naměřené data však souvisí na způsobu provádění experimentu a generovaných datech. 
 
