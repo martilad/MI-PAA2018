@@ -5,3 +5,4 @@ __venv__
 *.log
 *.out
 *.synctex.*
+build
