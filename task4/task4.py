@@ -1,8 +1,11 @@
 import timeit
 import click
 import os 
+import time
 import functools
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 from sa import sa
 from time import sleep
@@ -288,12 +291,26 @@ def solve(file, ins):
 @click.option('--outfile', help="prefix for outfile, to outfile will be printed data from\
 	simulated annealing and with some suffing created plot", required=True)
 @click.option('-g', is_flag=True)
-@click.option('-p', '--path', help="File with problem or problems to solve by simulated anealing.", required=True)
-def SA(outfile, g, path):
-	result = sa('inst', 'temp', 'cool_rate', 'min_temp', 'changes')
-	print("res", result)
-	print("prdelka")
+@click.option('-f', '--file', type=click.File(), help="File with problem or problems to solve by simulated anealing.", required=True)
+def SA(outfile, g, file):
+	if file is not None:
+		problems = loadProblemFromOpenFile(file)
+		for i in problems:
+			t1 = time.time()
+			result, sollution, plot = sa(i, 400, 0.997, 1, 40)
+			t = time.time() - t1
+			test = pd.DataFrame(plot)
+			test.columns = ['temp', "best", "current"]
+			test = test[::-1]
+			test.index = test['temp']
+			test = test.drop('temp', axis=1)
+			pie = test.plot()
+			pie.invert_xaxis()
+			fig = pie.get_figure()
+			fig.savefig("myplot.pdf")
+			print(result)
 
+	
 
 """	Manage function for subcommand stats. Compering algorithm to brute force count time and relative error. 
 	Can list whole directory with instance of problem or one file"""
