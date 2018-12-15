@@ -274,43 +274,60 @@ def my_knap_sack_solver():
 def solve(file, ins):
 	try:
 		if file is None and len(ins)>2:
-			print(printInlineSolutions(ins[0], ins[1], KnapSackSolver(ins).solveTBruteForce()[0]))
+			print(printInlineSolutions(ins[0], ins[1], KnapSackSolver(ins).solve(ALG.DC)[0]))
 			return
 		elif file is not None:
 			problems = loadProblemFromOpenFile(file)
 			for i in problems:
-				print(printInlineSolutions(i[0], i[1], KnapSackSolver(i).solveTBruteForce()[0]))
+				print(printInlineSolutions(i[0], i[1], KnapSackSolver(i).solve(ALG.DC)[0]))
 			return
 	except BaseException as e:
 		raise e
 		return
 	print("Error - problem format")
 
+def drange(start, stop, step):
+	r = start
+	while r < stop:
+		yield r
+		r += step
+
 """	Solve and test and stats instances with simulated anealing"""
 @my_knap_sack_solver.command()
 @click.option('--outfile', help="prefix for outfile, to outfile will be printed data from\
 	simulated annealing and with some suffing created plot", required=True)
-@click.option('-g', is_flag=True)
+@click.option('-t', default="10 11 1")
+@click.option('-c', default="0.995 0.999 0.001")
+@click.option('-i', default="10 11 1")
 @click.option('-f', '--file', type=click.File(), help="File with problem or problems to solve by simulated anealing.", required=True)
-def SA(outfile, g, file):
+@click.option('-s', '--sol', type=click.File(), help="File with problem sollution.", required=True)
+def SA(outfile, t, c, i, file, sol):
+	csv = WriteCSVData(outfile + ".csv", ",")
 	if file is not None:
 		problems = loadProblemFromOpenFile(file)
-		for i in problems:
-			t1 = time.time()
-			result, sollution, plot = sa(i, 400, 0.997, 1, 40)
-			t = time.time() - t1
-			test = pd.DataFrame(plot)
-			test.columns = ['temp', "best", "current"]
-			test = test[::-1]
-			test.index = test['temp']
-			test = test.drop('temp', axis=1)
-			pie = test.plot()
-			pie.invert_xaxis()
-			fig = pie.get_figure()
-			fig.savefig("myplot.pdf")
-			print(result)
+		solutions = loadProblemFromOpenFile(sol)
+		for index in range(len(problems)):
+			for _t in drange(*tuple([float(x) for x in t.split(" ")])):
+				for _c in drange(*tuple([float(x) for x in c.split(" ")])):
+					for _i in drange(*tuple([float(x) for x in i.split(" ")])):
+						t1 = time.time()
+						result, sollution, bestErr, plot = sa(problems[index], solutions[index][2], _t, _c, 1, _i)
+						tim = time.time() - t1
+						test = pd.DataFrame(plot)
+						test.columns = ['temp', "best", "current", 'best error', 'avg error']
+						test = test[1:-1]
+						test = test[::-1]
+						test.index = test['temp']
+						test = test.drop('temp', axis=1)
+						pie = test.plot(y = ["best", "current"])
+						pie.invert_xaxis()
+						pie.set_ylabel("Relative error")
+						fig = pie.get_figure()
+						fig.savefig("plots/" + outfile + problems[index][0] + "_t" + str(_t) + "_c" + str(_c) + "_i" + str(_i) + "_er" + str(bestErr) + ".pdf")
+						plt.close(fig)
+						#print(tim, _t, _c, _i, result, bestErr)
+						csv.appendLine({"time":tim, "temp":_t, "cool_rate":_c, "cycle":_i, "err":bestErr})
 
-	
 
 """	Manage function for subcommand stats. Compering algorithm to brute force count time and relative error. 
 	Can list whole directory with instance of problem or one file"""

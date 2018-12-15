@@ -13,11 +13,11 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
-def sa(inst, temperature, cooling_coef, min_temp, inner_loop):
+def sa(inst, soll, temperature, cooling_coef, min_temp, inner_loop):
 
     cdef int n
     cdef int max_weight
-    
+    cdef float sol = float(soll)
     n = int(inst[1])
     max_weight = int(inst[2])
 
@@ -43,12 +43,12 @@ def sa(inst, temperature, cooling_coef, min_temp, inner_loop):
 
     while (temp > minT):
         
-        values.append([temp, best, current])
+        values.append([temp, best, current, (sol-best)/sol, (sol-current)/sol])
 
         for i in range(loop):
 
             # random flip
-            bit = rand() % 30
+            bit = rand() % n
             if workS[bit] == 0:
                 workS[bit] = 1
             else:
@@ -79,7 +79,7 @@ def sa(inst, temperature, cooling_coef, min_temp, inner_loop):
             
         temp = cool_coef * temp
     
-    return (best, bestS, values)
+    return (best, bestS, (sol-best)/sol, values)
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
