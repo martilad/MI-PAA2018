@@ -1,17 +1,1 @@
 python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "30 100 5000" -c"0.996 0.998 0.1" -i "60 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "60 100 5000" -c"0.996 0.998 0.1" -i "60 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "120 1000 5000" -c"0.996 0.998 0.1" -i "60 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "240 1000 5000" -c"0.996 0.998 0.1" -i "60 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "300 1000 5000" -c"0.996 0.998 0.1" -i "60 400 3000"
-
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "60 100 5000" -c"0.993 0.998 0.1" -i "120 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "60 100 5000" -c"0.995 0.998 0.1" -i "120 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "60 100 5000" -c"0.997 1 0.1" -i "120 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "60 100 5000" -c"0.999 1 0.1" -i "120 400 3000"
-
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "60 100 5000" -c"0.998 0.999 0.1" -i "30 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "60 100 5000" -c"0.998 0.999 0.1" -i "60 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "60 100 5000" -c"0.998 0.999 0.1" -i "120 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "60 100 5000" -c"0.998 0.999 0.1" -i "180 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "60 100 5000" -c"0.998 0.999 0.1" -i "240 400 3000"
-python task4.py sa --outfile="temp" --file="./inst/knap_gen_100.dat" --sol="./inst/knap_gen_100.sol.dat" -t "60 100 5000" -c"0.998 0.999 0.1" -i "300 400 3000"
