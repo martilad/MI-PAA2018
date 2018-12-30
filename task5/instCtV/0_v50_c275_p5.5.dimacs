@@ -1,4 +1,5 @@
 c A SAT instance generated from a 3-CNF formula that had 275 clauses and 50 variables
+c weights 48 28 4 40 23 19 20 24 21 44 47 41 43 12 43 24 49 29 26 11 27 11 8 44 20 14 12 45 50 30 9 42 28 5 5 37 24 27 49 42 34 16 35 27 42 39 28 26 26 10
 p cnf 50 275
 -15 38 -47 0
 40 -34 -50 0

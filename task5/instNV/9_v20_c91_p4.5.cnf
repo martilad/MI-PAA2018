@@ -5,6 +5,7 @@ c    forced? no
 c    mixed sat? no 
 c    clause length = 3 
 c
+c weights 41 13 10 21 6 16 30 43 9 15 18 48 45 3 30 5 46 26 36 32
 p cnf 20  91 
  1 18 -9 0
 6 -7 20 0
