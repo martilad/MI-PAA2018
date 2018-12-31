@@ -13,8 +13,9 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
-def sa(inst, soll, temperature, cooling_coef, min_temp, inner_loop):
-
+def ga(n_var, n_clause, weights, clauses, gen_count, gen_size, mut, cross, elitism, select):
+    print("ahoj")
+    return
     cdef int n
     cdef int max_weight
     cdef float sol = float(soll)

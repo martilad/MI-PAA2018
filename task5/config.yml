@@ -1,0 +1,10 @@
+RUN:
+    out: ./out/test
+    in: ./inst
+GA:
+    generationsize: 100
+    generationcount: 1000
+    mutation: 0.01 0.05 0.01
+    crossover: 0.5
+    selection: tournament
+    elitism: True
