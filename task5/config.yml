@@ -4,7 +4,7 @@ RUN:
 GA:
     generationsize: 100
     generationcount: 1000
-    mutation: 0.01 0.05 0.01
+    mutation: 0.04 0.05 0.01
     crossover: 0.5
     selection: 5 10 5
     elitism: True

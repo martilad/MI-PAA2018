@@ -2,13 +2,84 @@ import click
 import os
 import yaml
 import time
-import functools
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from GA import ga
 from os import listdir
 from os.path import isfile, join
+
+
+@click.command()
+@click.option('-c', '--config', metavar='CONFIG', help="Config file in yaml format.")
+def solve(config):
+    """Method solve each problem with all parameters specific in configuration file."""
+    if config is None:
+        print("You need to specify a configuration file.")
+    config = load_config(config)
+    csv = WriteCSVData(config['out'] + "_data" + ".csv", ",")
+    inst_id_counter = 0
+    if os.path.isdir(config['in']):
+        only_files = [config['in'] + "/" + f for f in listdir(config['in']) if isfile(join(config['in'], f))]
+        for file in only_files:
+            problem = load_problem(file)
+            for gen_count in drange(*config['generationcount']):
+                for gen_size in drange(*config['generationsize']):
+                    for mut in drange(*config['mutation']):
+                        for cross in drange(*config['crossover']):
+                            for t_size in drange(*config['selection']):
+                                t1 = time.time()
+                                score, generations, n_sol, n_clau = ga(*problem, gen_count, gen_size, mut,
+                                                                       cross, config['elitism'], t_size)
+                                csv.append_line({"id": inst_id_counter, "gen_size": gen_size, "gen_count": gen_count,
+                                                 "mut": mut, "cross": cross, "elitism": config['elitism'],
+                                                 "t_size": t_size, "time": time.time() - t1, "score": score})
+                                inst_id_counter += 1
+
+                                # Solutions plot
+                                fig = plt.figure()
+                                ax = fig.add_subplot(1, 1, 1)
+                                ax.scatter([j for j in range(gen_count)], y=n_sol, s=10, marker='^', c='red')
+                                ax.set_ylabel("Počet řešení")
+                                ax.set_xlabel("Generace")
+                                ax.set_ylim([0, gen_size])
+                                fig.savefig(config['out'] + str(inst_id_counter) + "_sol" + ".pdf")
+                                plt.close(fig)
+
+                                # Generations plots with fitnes and satisfied clause
+                                some_plot(n_clau, config['out'] + str(inst_id_counter) + "_cla" + ".pdf", "Fitness")
+                                some_plot(generations, config['out'] + str(inst_id_counter) + "_gen" + ".pdf",
+                                          "Počet splněných clausulí")
+    else:
+        print("Problems not a path with problems.")
+
+
+def some_plot(data, name, y_label):
+    test = pd.DataFrame(data)
+    test['max'] = test.max(axis=1)
+    test['mean'] = test.mean(axis=1)
+    test['median'] = test.median(axis=1)
+    test['min'] = test.min(axis=1)
+    test['max_x'] = test['min']
+    max_x = 0
+    for i in test.index:
+        if test['max'][i] > max_x:
+            test.loc[i, 'max_x'] = test['max'][i]
+            max_x = test['max'][i]
+        else:
+            test.loc[i, 'max_x'] = test['max_x'][i - 1]
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.plot(test['max'])
+    ax.plot(test['mean'])
+    ax.plot(test['median'])
+    ax.plot(test['min'])
+    ax.plot(test['max_x'])
+    ax.set_ylabel(y_label)
+    ax.set_xlabel("Generace")
+    # ax.set_ylim([0, gen_size])
+    fig.savefig(name)
+    plt.close(fig)
 
 
 def load_problem(file):
@@ -50,37 +121,6 @@ def load_problem(file):
             if cnt >= n_c:
                 break
         return n_v, n_c, weights, clause
-
-
-@click.command()
-@click.option('-c', '--config', metavar='CONFIG', help="Config file in yaml format.")
-def solve(config):
-    """Method solve each problem with all parameters specific in configuration file."""
-    if config is None:
-        print("You need to specify a configuration file.")
-    config = load_config(config)
-    csv = WriteCSVData(config['out'] + "_data" + ".csv", ",")
-    inst_id_counter = 0
-    if os.path.isdir(config['in']):
-        only_files = [config['in'] + "/" + f for f in listdir(config['in']) if isfile(join(config['in'], f))]
-        for file in only_files:
-            problem = load_problem(file)
-            for gen_size in drange(*config['generationcount']):
-                for gen_count in drange(*config['generationsize']):
-                    for mut in drange(*config['mutation']):
-                        for cross in drange(*config['crossover']):
-                            for t_size in drange(*config['selection']):
-                                t1 = time.time()
-                                score, generations, n_sol, n_clau = ga(*problem, gen_count, gen_size, mut,
-                                                                                     cross, config['elitism'], t_size)
-                                csv.append_line({"id": inst_id_counter, "gen_size": gen_size, "gen_count": gen_count,
-                                                 "mut": mut, "cross": cross, "elitism": config['elitism'],
-                                                 "t_size": t_size, "time": time.time() - t1, "score": score})
-                                inst_id_counter += 1
-                                print(time.time() - t1, "-----", file)
-                                # Some plots
-    else:
-        print("Problems not a path with problems.")
 
 
 def drange(start, stop, step):

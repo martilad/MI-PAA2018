@@ -10,7 +10,7 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 def ga(n_var, n_clause, weights, clause, gen_count, gen_size, mut, cross, elitism, t_size):
 
     cdef int i, j, gen, _n_var, _n_clause, _gen_count, _gen_size, _elitism, _best_score = 0, _total_weight = 0
-    cdef double _mut, _cross, _t_size
+    cdef float _mut, _cross, _t_size
     cdef int _good_clause, _weight, _sum_solutions
     if elitism is True:
         _elitism = 1
@@ -24,11 +24,12 @@ def ga(n_var, n_clause, weights, clause, gen_count, gen_size, mut, cross, elitis
     _cross = cross
     _t_size = t_size
 
+    # For ast access
+    cdef np.ndarray[np.int64_t, ndim=1] _weights = np.array(weights, dtype=np.int64)
     # Data for plots
     cdef np.ndarray[np.int64_t, ndim=1] n_sol = np.zeros(_gen_count, dtype=np.int64)
     cdef np.ndarray[np.int64_t, ndim=2] n_clau = np.zeros((_gen_count, _gen_size), dtype=np.int64)
-    cdef np.ndarray[np.int64_t, ndim=2] generations = np.zeros((_gen_count, _gen_size), dtype=np.int64)
-    cdef np.ndarray[np.int64_t, ndim=1] _weights = np.array(weights, dtype=np.int64)
+    cdef np.ndarray[np.float64_t, ndim=2] generations = np.zeros((_gen_count, _gen_size), dtype=np.float64)
     cdef np.ndarray[np.float64_t, ndim=1] _population_fitness = np.zeros(_gen_size, dtype=np.float64)
     # Clause and population
     cdef int ** _clauses = load_clause(clause, _n_clause)
@@ -57,14 +58,19 @@ def ga(n_var, n_clause, weights, clause, gen_count, gen_size, mut, cross, elitis
                 _sum_solutions += 1
             _population_fitness[i] = fitness(0.95, _good_clause, _n_clause, _weight, _total_weight)
 
-            generations[gen][i] = _population_fitness[i]
-            n_clau[gen][i] = _good_clause
+            generations[gen, i] = _population_fitness[i]
+            n_clau[gen, i] = _good_clause
 
             if _population_fitness[i] > _best_score:
                 copy_sol(_n_var, _best, _population[i])
 
         n_sol[gen] = _sum_solutions
-        # save best
+
+        if rand()/<float>RAND_MAX < _cross:
+                ind = rand() % n_var
+
+        for i in range(_gen_size):
+            mutation(_population[i], _n_var, _mut)
 
         # dokud nenagradim populaci opakuju
             # selektnu jedince
@@ -78,6 +84,17 @@ def ga(n_var, n_clause, weights, clause, gen_count, gen_size, mut, cross, elitis
     PyMem_Free(_b)
     PyMem_Free(_best)
     return _best_score, generations, n_sol, n_clau
+
+@cython.boundscheck(False)
+cdef void mutation(int * one, int size, double mut):
+    cdef int i
+    for i in range(size):
+        if rand()/<float>RAND_MAX < mut:
+            if one[i] == 1:
+                one[i] = 0
+            else:
+                one[i] = 1
+
 
 @cython.boundscheck(False)
 cdef int solution_weight(int * one, int size, np.int64_t[:] weights):
