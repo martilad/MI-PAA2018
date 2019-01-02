@@ -6,5 +6,5 @@ GA:
     generationcount: 1000
     mutation: 0.01 0.05 0.01
     crossover: 0.5
-    selection: tournament
+    selection: 5 10 5
     elitism: True

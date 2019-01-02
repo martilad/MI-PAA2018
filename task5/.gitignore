@@ -3,3 +3,4 @@ __venv__
 *.so
 *egg*
 *.c
+out

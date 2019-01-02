@@ -1,54 +1,49 @@
-import random
 import numpy as np
 cimport numpy as np
 cimport cython
 from libc.math cimport exp
-
-from cpython cimport array
 from libc.stdlib cimport rand, RAND_MAX
-from collections import deque
-import time
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
-def ga(n_var, n_clause, weights, clauses, gen_count, gen_size, mut, cross, elitism, select):
-    print("ahoj")
-    return
-    cdef int n
-    cdef int max_weight
-    cdef float sol = float(soll)
-    n = int(inst[1])
-    max_weight = int(inst[2])
+def ga(n_var, n_clause, weights, clause, gen_count, gen_size, mut, cross, elitism, t_size):
 
-    cdef np.ndarray[np.int64_t, ndim=1] prices = np.array(inst[3:][1::2], dtype=np.int64)
-    cdef np.ndarray[np.int64_t, ndim=1] weights = np.array(inst[3:][::2], dtype=np.int64)
+    cdef int i, j, k, _n_var, _n_clause, _gen_count, _gen_size, _elitism, best_score
+    cdef double _mut, _cross, _t_size
 
-    cdef list values = []
+    if elitism is True:
+        _elitism = 1
+    else:
+        _elitism = 0
+    _n_clause = n_clause
+    _n_var = n_var
+    _gen_count = gen_count
+    _gen_size = gen_size
+    _mut = mut
+    _cross = cross
+    _t_size = t_size
+
+    # Data for plots
+    cdef np.ndarray[np.int64_t, ndim=1] n_sol = np.zeros(_gen_count, dtype=np.int64)
+    cdef np.ndarray[np.int64_t, ndim=1] n_clau = np.zeros(_gen_count, dtype=np.int64)
+    cdef np.ndarray[np.int64_t, ndim=1] n_best_score = np.zeros(_gen_count, dtype=np.int64)
+    cdef np.ndarray[np.int64_t, ndim=2] generations = np.zeros((_gen_count, _gen_size), dtype=np.int64)
+
+    # Clause and population
+    cdef int ** clauses = <int **> PyMem_Malloc(_n_clause * sizeof(int*))
+    cdef int ** populations = <int **> PyMem_Malloc(_gen_size * sizeof(int*))
 
 
-    cdef int best = 0
-    cdef np.ndarray[np.int64_t, ndim=1] bestS = np.zeros(n, dtype=np.int64)
 
-    cdef int current = 0
-    cdef np.ndarray[np.int64_t, ndim=1] currentS = np.zeros(n, dtype=np.int64)
 
-    cdef np.ndarray[np.int64_t, ndim=1] workS = np.zeros(n, dtype=np.int64)
 
-    cdef float temp = temperature
-    cdef float cool_coef = cooling_coef
-    cdef float minT = min_temp
-    cdef int loop = inner_loop
-    cdef int i, bit, scoreN, weightN
 
-    while (temp > minT):
-        
-        values.append([temp, best, current, (sol-best)/sol, (sol-current)/sol])
+    return best_score, generations, n_sol, n_clau, n_best_score
 
-        for i in range(loop):
-
-            # random flip
+"""
+    
             bit = rand() % n
             if workS[bit] == 0:
                 workS[bit] = 1
@@ -80,7 +75,7 @@ def ga(n_var, n_clause, weights, clauses, gen_count, gen_size, mut, cross, eliti
             
         temp = cool_coef * temp
     
-    return (best, bestS, (sol-best)/sol, values)
+    return (best, bestS, (sol-best)/sol, values)"""
 
 @cython.boundscheck(False)
 @cython.cdivision(True)
