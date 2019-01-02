@@ -71,12 +71,13 @@ def solve(config):
                         for cross in drange(*config['crossover']):
                             for t_size in drange(*config['selection']):
                                 t1 = time.time()
-                                score, generations, n_sol, n_clau, n_best_score = ga(*problem, gen_count, gen_size, mut,
+                                score, generations, n_sol, n_clau = ga(*problem, gen_count, gen_size, mut,
                                                                                      cross, config['elitism'], t_size)
                                 csv.append_line({"id": inst_id_counter, "gen_size": gen_size, "gen_count": gen_count,
                                                  "mut": mut, "cross": cross, "elitism": config['elitism'],
                                                  "t_size": t_size, "time": time.time() - t1, "score": score})
                                 inst_id_counter += 1
+                                print(time.time() - t1, "-----", file)
                                 # Some plots
     else:
         print("Problems not a path with problems.")
