@@ -33,7 +33,7 @@ def solve(config):
                                 csv.append_line({"id": inst_id_counter, "gen_size": gen_size, "gen_count": gen_count,
                                                  "mut": mut, "cross": cross, "elitism": config['elitism'],
                                                  "t_size": t_size, "time": time.time() - t1, "score": score})
-                                inst_id_counter += 1
+
 
                                 # Solutions plot
                                 fig = plt.figure()
@@ -46,9 +46,10 @@ def solve(config):
                                 plt.close(fig)
 
                                 # Generations plots with fitnes and satisfied clause
-                                some_plot(n_clau, config['out'] + str(inst_id_counter) + "_cla" + ".pdf", "Fitness")
+                                some_plot(n_clau, config['out'] + str(inst_id_counter) + "_cla" + ".pdf", "Počet splněných clausulí")
                                 some_plot(generations, config['out'] + str(inst_id_counter) + "_gen" + ".pdf",
-                                          "Počet splněných clausulí")
+                                          "Fitness")
+                                inst_id_counter += 1
     else:
         print("Problems not a path with problems.")
 
@@ -68,15 +69,18 @@ def some_plot(data, name, y_label):
         else:
             test.loc[i, 'max_x'] = test['max_x'][i - 1]
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(9, 6.5))
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(test['max'])
     ax.plot(test['mean'])
     ax.plot(test['median'])
     ax.plot(test['min'])
     ax.plot(test['max_x'])
+    ax.legend(['max in generation', 'mean', 'median', 'minimum', 'maximum from begin'],
+              bbox_to_anchor=(0., 1.02, 1., .102), fontsize=10, ncol=2,
+              loc='lower left', mode="expand", borderaxespad=0.)
     ax.set_ylabel(y_label)
-    ax.set_xlabel("Generace")
+    ax.set_xlabel("Generation")
     # ax.set_ylim([0, gen_size])
     fig.savefig(name)
     plt.close(fig)
