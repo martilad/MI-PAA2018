@@ -2,9 +2,11 @@ RUN:
     out: ./out/test
     in: ./inst
 GA:
-    generationsize: 1000
-    generationcount: 1000
-    mutation: 0.01 0.1 0.05
-    crossover: 0.75
-    selection: 20 260 90
-    elitism: False
+    generationsize: 500
+    generationcount: 100
+    mutation: 0.1
+    crossover: 0.7
+    selection: 0.1
+    selection_add: 2
+    elitism: 1
+    fitness: 0.95

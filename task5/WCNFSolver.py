@@ -29,7 +29,8 @@ def solve(config):
                             for t_size in drange(*config['selection']):
                                 t1 = time.time()
                                 score, generations, n_sol, n_clau = ga(*problem, gen_count, gen_size, mut,
-                                                                       cross, config['elitism'], t_size)
+                                                                       cross, t_size, config['elitism'],
+                                                                       config['selection_add'], config['fitness'])
                                 csv.append_line({"id": inst_id_counter, "gen_size": gen_size, "gen_count": gen_count,
                                                  "mut": mut, "cross": cross, "elitism": config['elitism'],
                                                  "t_size": t_size, "time": time.time() - t1, "score": score})
@@ -42,12 +43,12 @@ def solve(config):
                                 ax.set_ylabel("Počet řešení")
                                 ax.set_xlabel("Generace")
                                 ax.set_ylim([0, gen_size])
-                                fig.savefig(config['out'] + str(inst_id_counter) + "_sol" + ".pdf")
+                                fig.savefig(config['out'] + str(inst_id_counter) + "_" + file.split("/")[-1] + "_sol" + ".pdf")
                                 plt.close(fig)
 
                                 # Generations plots with fitnes and satisfied clause
-                                some_plot(n_clau, config['out'] + str(inst_id_counter) + "_cla" + ".pdf", "Počet splněných clausulí")
-                                some_plot(generations, config['out'] + str(inst_id_counter) + "_gen" + ".pdf",
+                                some_plot(n_clau, config['out'] + str(inst_id_counter) + "_" + file.split("/")[-1] + "_cla" + ".pdf", "Počet splněných clausulí")
+                                some_plot(generations, config['out'] + str(inst_id_counter) + "_" + file.split("/")[-1] + "_gen" + ".pdf",
                                           "Fitness")
                                 inst_id_counter += 1
     else:
@@ -199,12 +200,17 @@ def load_config(configuration_file):
                 print("Not specific", i, "please add to config.")
                 exit(1)
         if 'elitism' in tmp:
-            if tmp['elitism']:
-                config['elitism'] = True
-            else:
-                config['elitism'] = False
+            config['elitism'] = int(tmp['elitism'])
         else:
-            config['elitism'] = True
+            config['elitism'] = 0
+        if 'selection_add' in tmp:
+            config['selection_add'] = int(tmp['selection_add'])
+        else:
+            config['selection_add'] = 0
+        if 'fitness' in tmp:
+            config['fitness'] = float(tmp['fitness'])
+        else:
+            config['fitness'] = 0.5
     else:
         print("Configuration fail. See example.")
         exit(1)
