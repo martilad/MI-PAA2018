@@ -4,3 +4,7 @@ __venv__
 *egg*
 *.c
 out
+*.aux
+*.log
+*.out
+*.synctex.gz

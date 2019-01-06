@@ -44,7 +44,7 @@ def solve(config):
                                 some_basic_plot(n_best_weight, gen_count, base_file_name + "_weight" + ".pdf",
                                                 "Hodnota řešení", None)
 
-                                # Generations plots with fitnes and satisfied clause
+                                # Generations plots with fitness and satisfied clause
                                 some_stats_plot(n_clau, base_file_name + "_cla" + ".pdf", "Počet splněných clausulí")
                                 some_stats_plot(generations, base_file_name + "_gen" + ".pdf",
                                           "Fitness")
@@ -54,13 +54,20 @@ def solve(config):
 
 
 def some_basic_plot(data, size, file, y_label, y_range):
-    fig = plt.figure()
+    fig = plt.figure(figsize=(20, 17))
+
     ax = fig.add_subplot(1, 1, 1)
-    ax.scatter([j for j in range(size)], y=data, s=10, marker='^', c='red')
-    ax.set_ylabel(y_label)
-    ax.set_xlabel("Generace")
+    ax.scatter([j for j in range(size)], y=data, s=500, marker='o', c='blue')
+    ax.set_ylabel(y_label, fontsize=60)
+    ax.set_xlabel("Generace", fontsize=60)
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label.set_fontsize(40)
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label.set_fontsize(40)
     if y_range is not None:
         ax.set_ylim(y_range)
+    plt.grid()
+    ax.set_axisbelow(True)
     fig.savefig(file)
     plt.close(fig)
 
@@ -80,18 +87,24 @@ def some_stats_plot(data, file, y_label):
         else:
             test.loc[i, 'max_x'] = test['max_x'][i - 1]
 
-    fig = plt.figure(figsize=(9, 6.5))
+    fig = plt.figure(figsize=(20, 17))
     ax = fig.add_subplot(1, 1, 1)
-    ax.plot(test['max'])
-    ax.plot(test['mean'])
-    ax.plot(test['median'])
-    ax.plot(test['min'])
-    ax.plot(test['max_x'])
-    ax.legend(['maximum v generaci', 'mean', 'median', 'minimum', 'maximum of počátku'],
-              bbox_to_anchor=(0., 1.02, 1., .102), fontsize=10, ncol=2,
-              loc='lower left', mode="expand", borderaxespad=0.)
-    ax.set_ylabel(y_label)
-    ax.set_xlabel("Generace")
+    linewidth = 4
+    ax.plot(test['max'], linewidth=linewidth)
+    ax.plot(test['mean'], linewidth=linewidth)
+    ax.plot(test['median'], linewidth=linewidth)
+    ax.plot(test['min'], linewidth=linewidth)
+    ax.plot(test['max_x'], linewidth=linewidth)
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label.set_fontsize(40)
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label.set_fontsize(40)
+    ax.legend(['max (generation)', 'mean', 'median', 'minimum', 'max (start)'],
+              bbox_to_anchor=(0.5, 0.0, 0, 0), fontsize=45, ncol=2,
+               mode="expand", frameon=False, loc='lower center')
+    ax.set_ylabel(y_label, fontsize=60)
+    ax.set_xlabel("Generace", fontsize=60)
+
     fig.savefig(file)
     plt.close(fig)
 
