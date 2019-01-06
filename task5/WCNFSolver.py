@@ -28,34 +28,44 @@ def solve(config):
                         for cross in drange(*config['crossover']):
                             for t_size in drange(*config['selection']):
                                 t1 = time.time()
-                                score, generations, n_sol, n_clau = ga(*problem, gen_count, gen_size, mut,
+                                score, generations, n_sol, n_clau, n_best_weight, satisfied = ga(*problem, gen_count, gen_size, mut,
                                                                        cross, t_size, config['elitism'],
                                                                        config['selection_add'], config['fitness'])
                                 csv.append_line({"id": inst_id_counter, "gen_size": gen_size, "gen_count": gen_count,
                                                  "mut": mut, "cross": cross, "elitism": config['elitism'],
-                                                 "t_size": t_size, "time": time.time() - t1, "score": score})
+                                                 "t_size": t_size, "time": time.time() - t1, "score": score,
+                                                 "satisfied": satisfied, "n_var": problem[0], "n_clause": problem[1]})
 
-
+                                base_file_name = config['out'] + str(inst_id_counter) + "_v" + \
+                                                 str(problem[0]) + "_c" + str(problem[1])
                                 # Solutions plot
-                                fig = plt.figure()
-                                ax = fig.add_subplot(1, 1, 1)
-                                ax.scatter([j for j in range(gen_count)], y=n_sol, s=10, marker='^', c='red')
-                                ax.set_ylabel("Počet řešení")
-                                ax.set_xlabel("Generace")
-                                ax.set_ylim([0, gen_size])
-                                fig.savefig(config['out'] + str(inst_id_counter) + "_" + file.split("/")[-1] + "_sol" + ".pdf")
-                                plt.close(fig)
+                                some_basic_plot(n_sol, gen_count, base_file_name + "_sol" + ".pdf", "Počet řešení",
+                                                [0, n_sol.max()+1])
+                                some_basic_plot(n_best_weight, gen_count, base_file_name + "_weight" + ".pdf",
+                                                "Hodnota řešení", None)
 
                                 # Generations plots with fitnes and satisfied clause
-                                some_plot(n_clau, config['out'] + str(inst_id_counter) + "_" + file.split("/")[-1] + "_cla" + ".pdf", "Počet splněných clausulí")
-                                some_plot(generations, config['out'] + str(inst_id_counter) + "_" + file.split("/")[-1] + "_gen" + ".pdf",
+                                some_stats_plot(n_clau, base_file_name + "_cla" + ".pdf", "Počet splněných clausulí")
+                                some_stats_plot(generations, base_file_name + "_gen" + ".pdf",
                                           "Fitness")
                                 inst_id_counter += 1
     else:
         print("Problems not a path with problems.")
 
 
-def some_plot(data, name, y_label):
+def some_basic_plot(data, size, file, y_label, y_range):
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.scatter([j for j in range(size)], y=data, s=10, marker='^', c='red')
+    ax.set_ylabel(y_label)
+    ax.set_xlabel("Generace")
+    if y_range is not None:
+        ax.set_ylim(y_range)
+    fig.savefig(file)
+    plt.close(fig)
+
+
+def some_stats_plot(data, file, y_label):
     test = pd.DataFrame(data)
     test['max'] = test.max(axis=1)
     test['mean'] = test.mean(axis=1)
@@ -77,13 +87,12 @@ def some_plot(data, name, y_label):
     ax.plot(test['median'])
     ax.plot(test['min'])
     ax.plot(test['max_x'])
-    ax.legend(['max in generation', 'mean', 'median', 'minimum', 'maximum from begin'],
+    ax.legend(['maximum v generaci', 'mean', 'median', 'minimum', 'maximum of počátku'],
               bbox_to_anchor=(0., 1.02, 1., .102), fontsize=10, ncol=2,
               loc='lower left', mode="expand", borderaxespad=0.)
     ax.set_ylabel(y_label)
-    ax.set_xlabel("Generation")
-    # ax.set_ylim([0, gen_size])
-    fig.savefig(name)
+    ax.set_xlabel("Generace")
+    fig.savefig(file)
     plt.close(fig)
 
 

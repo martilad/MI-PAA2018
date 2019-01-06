@@ -10,8 +10,8 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 @cython.cdivision(True)
 def ga(n_var, n_clause, weights, clause, gen_count, gen_size, mut, cross, t_size_t, elitism, selection_add, fitness_cf):
 
-    cdef int i, j, gen, _n_var, _n_clause, _gen_count, _gen_size, _elitism, _best_score = 0, _total_weight = 0, _t_size
-    cdef double _mut, _cross, _fitness_cf
+    cdef int i, j, gen, _n_var, _n_clause, _gen_count, _gen_size, _elitism, _total_weight = 0, _t_size
+    cdef double _mut, _cross, _fitness_cf, _best_score = 0, temp
     cdef int _good_clause, _weight, _sum_solutions, _selection_add, tmp
     _fitness_cf = fitness_cf
     _selection_add = selection_add
@@ -28,6 +28,7 @@ def ga(n_var, n_clause, weights, clause, gen_count, gen_size, mut, cross, t_size
     cdef np.ndarray[np.int64_t, ndim=1] _weights = np.array(weights, dtype=np.int64)
     # Data for plots
     cdef np.ndarray[np.int64_t, ndim=1] n_sol = np.zeros(_gen_count, dtype=np.int64)
+    cdef np.ndarray[np.float64_t, ndim=1] n_best_weight = np.zeros(_gen_count, dtype=np.float64)
     cdef np.ndarray[np.int64_t, ndim=2] n_clau = np.zeros((_gen_count, _gen_size), dtype=np.int64)
     cdef np.ndarray[np.float64_t, ndim=2] generations = np.zeros((_gen_count, _gen_size), dtype=np.float64)
     cdef np.ndarray[np.float64_t, ndim=1] _population_fitness = np.zeros(_gen_size, dtype=np.float64)
@@ -71,9 +72,13 @@ def ga(n_var, n_clause, weights, clause, gen_count, gen_size, mut, cross, t_size
             generations[gen, i] = _population_fitness[i]
             n_clau[gen, i] = _good_clause
 
-            # save the best
+            # save the best, non interact in the population but it is good keep it, and print stats on it.
             if _population_fitness[i] > _best_score:
                 copy_sol(_n_var, _best, _population[i])
+                _best_score = _population_fitness[i]
+
+
+        n_best_weight[gen] = solution_weight(_best, _n_var, _weights)
 
         # stats for number of proper solution in population
         n_sol[gen] = _sum_solutions
@@ -123,13 +128,15 @@ def ga(n_var, n_clause, weights, clause, gen_count, gen_size, mut, cross, t_size
         _population_tmp = _population
         _population = _population_switch
 
+    temp = satisfied_clauses(_clauses, _n_clause, _best)/<double>_n_clause
+
     free_mem(_clauses, _n_clause)
     free_mem(_population, _gen_size)
     free_mem(_population_tmp, _gen_size)
     PyMem_Free(_child_1)
     PyMem_Free(_child_2)
     PyMem_Free(_best)
-    return _best_score, generations, n_sol, n_clau
+    return _best_score, generations, n_sol, n_clau, n_best_weight, temp
 
 
 @cython.boundscheck(False)

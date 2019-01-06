@@ -1,12 +1,12 @@
 RUN:
-    out: ./out/test
+    out: ./out/t
     in: ./inst
 GA:
-    generationsize: 500
+    generationsize: 100
     generationcount: 100
     mutation: 0.1
     crossover: 0.7
     selection: 0.1
     selection_add: 2
     elitism: 1
-    fitness: 0.95
+    fitness: 0.99
