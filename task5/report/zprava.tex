@@ -54,40 +54,43 @@ Implementovaný genetický algoritmus je algoritmus, který se skládá z hlavn�
 
 \end{labeling}
 \section{Implementace}\label{kap:implementace}
-Algoritmus jsem implementoval v jazyce Python a pro hlavní cyklus genetického algoritmu jsem využil rožšiření Cython, kde je psát kód Pythonu typovaný a je překládán do jazyka C pro spojení efektivity psaní v jazyce Python a rychlosti jazyka C. 
+Algoritmus jsem implementoval v jazyce Python a pro hlavní cyklus genetického algoritmu jsem využil rožšiření Cython, kde lze psát kód Pythonu typovaný a je překládán do jazyka C pro spojení efektivity psaní v jazyce Python a rychlosti jazyka C. 
 
-Řešič příjímá v argumentech configurační soubor ve formátu yaml. V tomto souboru je podle vzoru (přiložen jako config.yml) nutné specifikovat složku s problémy, které bude algoritmus řešit a složku, kam bude ukládán výstup (csv soubor a grafy pro jednotlivé instance) a dále je také parametry samotného genetického algoritmu, které je možné zadávat jako počátek, konec a krok nebo jako jedinou hodnotu, pro rozsah budou vyzkušeny všechny zadané hodnoty. 
+Řešič příjímá v argumentech configurační soubor ve formátu yaml. V tomto souboru je podle vzoru (přiložen jako config.yml) nutné specifikovat složku s problémy, které bude algoritmus řešit a složku, kam bude ukládán výstup (csv soubor a grafy pro jednotlivé instance) a dále je také parametry samotného genetického algoritmu, které je možné zadávat jako počátek, konec a krok nebo jako jedinou hodnotu. Pro rozsah budou vyzkušeny všechny zadané hodnoty. 
 
-Jednotlivé generace ukládám jako 2D pole, takto ukládám i novou generaci do které jsou přídaní buď vybraní jedinci nebo v případě křížení jejich potomci. Klauzule a váhy jsou také uloženy pomocí polí. Pro každou generaci tdy iteruji tak dlouho doku nenaplním potřebný počet jedinců, který byli určeny v konfiguraci.
+Jednotlivé generace ukládám jako 2D pole, takto ukládám i novou generaci, do které jsou přidáni buď vybraní jedinci nebo v případě křížení jejich potomci. Klauzule a váhy jsou také uloženy pomocí polí. Pro každou generaci tedy iteruji tak dlouho dokud nenaplním potřebný počet jedinců, který byli určeny v konfiguraci.
 
 Turnaj je prováděn vybíráním počtu náhodných indexů, kde je z jedninců ponechán pouze nejlepší, který je vrácen. Přes všechny generace je také ponecháno nejlepší řešení, které ovšem nezasahuje do jednotlivých generací. Dále jsou také ukládány jednotlivé hodnoty fitness pro každého jedince v každé generaci, tak aby bylo možné vykreslit grafy průběhu algortimu. Parametry, které je možné nastavit pro genetický algoritmus jsou nasledující:
 
 \begin{labeling}{alligator}
-\item[\textbf{generationsize}] a
-\item[\textbf{generationcount}] a
-\item[\textbf{mutation}] a
-\item[\textbf{crossover}] a
-\item[\textbf{selection}] a
-\item[\textbf{selection\_add}] a
-\item[\textbf{elitism}] a
-\item[\textbf{fitness}] a 
+\item[\textbf{generationsize}] Počet jedinců v jedné generaci.
+\item[\textbf{generationcount}] Počet iterací algoritmu (počet generací).
+\item[\textbf{mutation}] Pravděpodobnost mutace jednoho bitu.
+\item[\textbf{crossover}] Pravděpodobnost křížení jedinců.
+\item[\textbf{selection}] Procento určijící kolik jedinců z populace bude vybráno.
+\item[\textbf{selection\_add}] Počet jednců o kolik je v každé generaci zvětšena velikost turnaje. Není zadáno v procentech a je možné zadat pouze jednu hodnotu.
+\item[\textbf{elitism}] Počet nejlepších jedinců, kteří jsou vybraní do nové generace. Není možné zadat intervalem s krokem.
+\item[\textbf{fitness}] Hodnota koeficientu $a$ popsaného v kapilole \ref{kap:rozbor}. Není možné zadat rozsahem hodnot a krokem.
 \end{labeling}
 
 \section{Testovací data}\label{kap:data}
+Testovací data k problému nebyly poskytnuty globálně, ale bylo nutné si nějaké testovací instance vytvořit nebo sehnat. Já jsem se při řešení problému omezil na instance problému 3-SAT, které lze bez vah jednotlivých problému, jednoduše sehnat na stránkách prot SAT Competition nebo SAT Race. První sadu instancí jsem použil instance ze \href{https://www.cs.ubc.ca/~hoos/SATLIB/benchm.html}{SATLIB}, kde mám k dispozici instance s počtem proměných od 91 do 175. Poměr klauzulí ku počtu proměných je přibližně 4.3, tedy tyto instance jsou nejtěžšími pro 3-SAT. Dále mám k dispozici instance 3-SAT náhodně generované (pomocí \href{https://toughsat.appspot.com/}{generátoru}) s počtem proměných 50, ale s rozsahem poměru klauzulí a proměných od 3 do 8. Všechny instance jsou ve formátu DIMACS. 
+
+Pro splnění zadání bylo nutné dogenerovat váhy k jednotlivým proměným. Pro zachování formátu a možnosti využití těchto instancí i pro SAT řešiče, jsem váhy uložil jako komentář~\textit{"c~weights~2~\dots"}, aby nebyl porušen formát souboru. Váhy jsem generoval náhodně z rozsahu 1-50 jako celá čísla. 
 
 \section{Testovací platforma}\label{kap:platform}
-
+Řešení samotného genetického algoritmu bylo vytvořeno v Cythonu a přeloženo do jazyka C. Experimenty jsem prováděl ve virtuálním prostředí s operačním systémem Debian 9. Procesor Intel Core i5 5200U @ 2.20GHz a testy byly prováděné v režimu jednoho vlákna.
 \subsection{Cíle}\label{kap:cil}
 
-Vlastnosti algoritmu lze měnit pomocí parametrů, jako je počáteční teplota, ochlazování a~počet iterací na jedné teplotě. Při řešení tohoto problému, jsem neuvažoval neplatná řešení, jelikož začínám s~prázdným batohem. Cílem je otestovat chování algoritmu v závislosti na těchto parametrech a~vyvodit závěry. Tedy se naučit iterativní heuristiku nastavit na tento problém a~řešit ho pomocí ní. 
+V genetickém algoritmu lze měnit jeho paramentry, cílem tedy je odzkoušet heuristiku v řešení Vážené splnitelnosti SAT problému v závislosti na těchto parametrech. Cílem je prozkoumat nastavení genetického algoritmu tak, aby algoritmus byl schopen řešit co nejvíce problému nebo řešit problémy s co nejmenší chybou.
 
 
 \section{Experimenty}\label{kap:experiments}
 
+V experimetech prozkoumám závislost genetického algoritmu na parametrech jako jsou počet generací, velikost populace, hodnota mutace, pravděpodobnost křížení a selekční tlak. Vždy se pokusím testovat jeden parametr a ostatní zafixuji, aby bylo možné měřit vliv tohoto parametru na průběh řešení. 
 
-Experimenty jsem prováděl v režimu jednoho vlákna na starším datovém serveru v podobě starého notebooku, který v době výpočtu nebyl používán. Výsledky tedy nejsou ovlivněny jinými běžícími programy. Procesor na testovacím stroji: \textit{Intel Pentium T3400 (2 cores). Taktován na 2.16~GHz s~1~MB cache}.
-Měření času CPU probíhalo v~knihovně $timeit$. Algoritmus jsem napsal v~Cythonu a~časy tedy nemohou být případně srovnávány s~řešením v~předchozích úlohách.
-
+\subsection{Závislost na počtu generací}
+no asi na tom něco bude...
  
 
 
