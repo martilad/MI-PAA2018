@@ -28,9 +28,13 @@ def solve(config):
                         for cross in drange(*config['crossover']):
                             for t_size in drange(*config['selection']):
                                 t1 = time.time()
-                                score, generations, n_sol, n_clau, n_best_weight, satisfied = ga(*problem, gen_count, gen_size, mut,
-                                                                       cross, t_size, config['elitism'],
-                                                                       config['selection_add'], config['fitness'])
+                                score, generations, n_sol, n_clau, n_best_weight, satisfied = ga(*problem, gen_count,
+                                                                                                 gen_size, mut,
+                                                                                                 cross, t_size,
+                                                                                                 config['elitism'],
+                                                                                                 config[
+                                                                                                     'selection_add'],
+                                                                                                 config['fitness'])
                                 csv.append_line({"id": inst_id_counter, "gen_size": gen_size, "gen_count": gen_count,
                                                  "mut": mut, "cross": cross, "elitism": config['elitism'],
                                                  "t_size": t_size, "time": time.time() - t1, "score": score,
@@ -40,15 +44,16 @@ def solve(config):
                                                  str(problem[0]) + "_c" + str(problem[1])
                                 # Solutions plot
                                 some_basic_plot(n_sol, gen_count, base_file_name + "_sol" + ".pdf", "Počet řešení",
-                                                [0, n_sol.max()+1])
+                                                [0, n_sol.max() + 1])
                                 some_basic_plot(n_best_weight, gen_count, base_file_name + "_weight" + ".pdf",
                                                 "Hodnota řešení", None)
 
                                 # Generations plots with fitness and satisfied clause
                                 some_stats_plot(n_clau, base_file_name + "_cla" + ".pdf", "Počet splněných clausulí")
                                 some_stats_plot(generations, base_file_name + "_gen" + ".pdf",
-                                          "Fitness")
+                                                "Fitness")
                                 inst_id_counter += 1
+                                print("Problem solved.", inst_id_counter, "/", len(only_files))
     else:
         print("Problems not a path with problems.")
 
@@ -101,7 +106,7 @@ def some_stats_plot(data, file, y_label):
         tick.label.set_fontsize(40)
     ax.legend(['max (generation)', 'mean', 'median', 'minimum', 'max (start)'],
               bbox_to_anchor=(0.5, 0.0, 0, 0), fontsize=45, ncol=2,
-               mode="expand", frameon=False, loc='lower center')
+              mode="expand", frameon=False, loc='lower center')
     ax.set_ylabel(y_label, fontsize=60)
     ax.set_xlabel("Generace", fontsize=60)
 

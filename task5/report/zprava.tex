@@ -7,6 +7,9 @@
 \usepackage{fancyhdr}
 \usepackage[czech]{babel}
 \usepackage[utf8]{inputenc}
+\usepackage{blindtext}
+\usepackage{scrextend}
+\addtokomafont{labelinglabel}{\sffamily}
 \hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
 
 \begin{document}
@@ -21,7 +24,7 @@
 \section{Problém} \label{kap:problem}
  Je dána booleovská formule $F$ proměnnných $X=(x_1, x_2, \dots, x_n)$ v konjunktivní normální formě (tj. součin součtů). Dále jsou dány celočíselné kladné váhy $W=(w_1, w_2, \dots, w_n).$ Najděte ohodnocení $Y=(y_1, y_2, \dots, y_n)$ proměnných $x_1, x_2, \dots, x_n$ tak, aby $F(Y)=1$ a součet vah proměnných, které jsou ohodnoceny jedničkou, byl maximální.
 
-Je přípustné se omezit na formule, v nichž má každá klauzule právě 3 literály (problém 3 SAT). Takto omezený problém je stejně těžký, ale možná se lépe programuje a lépe se posuzuje obtížnost instance (viz Selmanova prezentace v odkazech).
+Je přípustné se omezit na formule, v nichž má každá klauzule právě 3 literály (problém 3 SAT). Takto omezený problém je stejně těžký, ale možná se lépe programuje a lépe se posuzuje obtížnost instance (viz \href{https://moodle.fit.cvut.cz/course/format/wiki/mediafile.php?id=99&path=%2fhomeworks%2f06%2fai-phys1.pdf}{Selmanova prezentace v odkazech}).
  
  
 \section{Zadání úlohy} \label{kap:zadani}
@@ -31,10 +34,44 @@ Problém řešte některou z pokročilých lokálních heuristik (simulované oc
 Tato práce by měla sloužit jako ověření Vašich schopností používat zvolenou pokročilou iterativní metodu. Ideálním výstupem by měl být algoritmus schopný řešit co nejširší spektrum instancí s~rozumnou chybou. To neznamená, že pokud se Vám některé instance "nepovedou", je vše špatně. Důležité je, abychom viděli, že jste se aspoň snažili. Někdy to prostě nejde...
 
 \section{Rozbor zadaného problému}\label{kap:rozbor}
+Úkolem semestrální práce je vytvořit program řešící problém vážené splnitelnosti boolovské formule v konjunktivní normální formě. Tedy řešit SAT problém s váhami jednotlivých proměných. 
+
+Hlavním kritériem pro mě bude splnění takového problému, tedy splnění všech klauzulí. Toto se ne vždy může podařit proto se případně budu snažit zachytit procento splněných klauzulí. Dalším kritériem bude váha dané instance podle ohodnocení proměných, která by měla být co nejvyšší. 
+
+Problém budu řešít pomocí genetického algoritmu, který popíši v další kapitole. Aby algoritmus mohl s řešeními pracovat je nutné vytvořit fitness funkci, pomocí které bude možné jednotlivé řešení porovnávat a rozhodovat o tom, které je úspěšnější. Tuto funkci jsem nejprve vytvořil jako součet poměru počtu splněných klauzulí a váhy ku maximální možné váze. K tomuto jsem byl následně nucet přidat koeficient ovlivňující přínos každého z kritérií, protože jak jsem psal výše splnění problému je primárním cílem. Vytvořená fitness funckce vypadá následovně: 
+$$ fitness(S) = a * \frac{\text{počet splněných klauzulí}}{\text{celkový počet klauzulí}} + (1 - a) * \frac{\text{váha řešení}}{\text{maximání možná váha}}$$
+kde $S$ je jedno řešení a $a$ koeficient určující poměr členů, kde vysoká hodnota $a$ blízká k 1 bude upřednostňovat řešení s větším počtem splněných klauzulí.
+
+V rámci řešení budu pracovat i s konfiguracemi, které nejsou řešením, protože prostor řešení je obrovský a jen pár konfigurací splňuje kritérium úspěšnosti řešení a při jeho oříznutí bych mohl dostat nespojitý prostor, kde bych mohl často uváznout v lokálním minimu.
 
 \section{Popis implementovaného genetického algoritmu}\label{kap:popisALG}
+Implementovaný genetický algoritmus je algoritmus, který se skládá z hlavního generačního cyklu a příslušných method, mezi hlavní patří selekce, mutace, křížení. Algoritmus je možné rozšířit i o mnoho dalších method např. elitismus nebo obměnu populace. Algoritmus je iterativní, kde počet cyklů může určovat předem daný počet nebo může být zastaven nějakou heuristikou. V práci jsem použil pevný počet cyklů, který je možné zadat. V každém cyklu je spočítána hodnota fitness funkce pro každého jedince. Dále jsou pomocí selekce vybíráni jedinci do nové populace. Tito jedinci mohou být kříženi a další vliv na ně má i mutace. Pomocí těchto method je možné udržet divezifikovanou populaci, pomocí které je probledáván stavový prostor. Popis jednotlivých metod:
+\begin{labeling}{alligator}
+\item[\textbf{Elitismus}] Je výběr nejlepších jedinců, kteří jdou do nové populace. Tento princip může vést k rychlé konvergenci populace.
+\item[\textbf{Selekce}] Selekci jsem implementoval pomocí turnaje. Selekční tlak je řízen velikostí turnaje, kde malé turnaje davájí šanci vybrat i slabé jednice. Tedy toto je výhodně spíše na začátku, proto jsem v algoritmu vytvořil možsnot nastavení postupného růstu velikosti turnaje s každou generací. Jedinci sou do turnaje vybíráni náhodně s opakování přes celou generaci. 
+\item[\textbf{Křížení}] Dva jedinci vybraní selekcí můžu být s nějakou pravděpodobností kříženi. Z křížení vzniknou nový potomci, kteří budou tvořit základ nové generace. Křížení je možné provádět více způsoby, kde jsem zvolil dvoubodové křížení.
+\item[\textbf{Mutace}] Je určena pravděpodobností změny každého bitu jedince. Provádí se pro každého jedince v nové generaci.
 
+\end{labeling}
 \section{Implementace}\label{kap:implementace}
+Algoritmus jsem implementoval v jazyce Python a pro hlavní cyklus genetického algoritmu jsem využil rožšiření Cython, kde je psát kód Pythonu typovaný a je překládán do jazyka C pro spojení efektivity psaní v jazyce Python a rychlosti jazyka C. 
+
+Řešič příjímá v argumentech configurační soubor ve formátu yaml. V tomto souboru je podle vzoru (přiložen jako config.yml) nutné specifikovat složku s problémy, které bude algoritmus řešit a složku, kam bude ukládán výstup (csv soubor a grafy pro jednotlivé instance) a dále je také parametry samotného genetického algoritmu, které je možné zadávat jako počátek, konec a krok nebo jako jedinou hodnotu, pro rozsah budou vyzkušeny všechny zadané hodnoty. 
+
+Jednotlivé generace ukládám jako 2D pole, takto ukládám i novou generaci do které jsou přídaní buď vybraní jedinci nebo v případě křížení jejich potomci. Klauzule a váhy jsou také uloženy pomocí polí. Pro každou generaci tdy iteruji tak dlouho doku nenaplním potřebný počet jedinců, který byli určeny v konfiguraci.
+
+Turnaj je prováděn vybíráním počtu náhodných indexů, kde je z jedninců ponechán pouze nejlepší, který je vrácen. Přes všechny generace je také ponecháno nejlepší řešení, které ovšem nezasahuje do jednotlivých generací. Dále jsou také ukládány jednotlivé hodnoty fitness pro každého jedince v každé generaci, tak aby bylo možné vykreslit grafy průběhu algortimu. Parametry, které je možné nastavit pro genetický algoritmus jsou nasledující:
+
+\begin{labeling}{alligator}
+\item[\textbf{generationsize}] a
+\item[\textbf{generationcount}] a
+\item[\textbf{mutation}] a
+\item[\textbf{crossover}] a
+\item[\textbf{selection}] a
+\item[\textbf{selection\_add}] a
+\item[\textbf{elitism}] a
+\item[\textbf{fitness}] a 
+\end{labeling}
 
 \section{Testovací data}\label{kap:data}
 
