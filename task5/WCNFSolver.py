@@ -35,7 +35,7 @@ def solve(config):
                                                                                                  config[
                                                                                                      'selection_add'],
                                                                                                  config['fitness'])
-                                csv.append_line({"id": inst_id_counter, "gen_size": gen_size, "gen_count": gen_count,
+                                csv.append_line({"id": inst_id_counter, "gen_size": gen_size, "gen_count": int(gen_count),
                                                  "mut": mut, "cross": cross, "elitism": config['elitism'],
                                                  "t_size": t_size, "time": time.time() - t1, "score": score,
                                                  "satisfied": satisfied, "n_var": problem[0], "n_clause": problem[1]})
@@ -43,9 +43,9 @@ def solve(config):
                                 base_file_name = config['out'] + str(inst_id_counter) + "_v" + \
                                                  str(problem[0]) + "_c" + str(problem[1])
                                 # Solutions plot
-                                some_basic_plot(n_sol, gen_count, base_file_name + "_sol" + ".pdf", "Počet řešení",
+                                some_basic_plot(n_sol, int(gen_count), base_file_name + "_sol" + ".pdf", "Počet řešení",
                                                 [0, n_sol.max() + 1])
-                                some_basic_plot(n_best_weight, gen_count, base_file_name + "_weight" + ".pdf",
+                                some_basic_plot(n_best_weight, int(gen_count), base_file_name + "_weight" + ".pdf",
                                                 "Hodnota řešení", None)
 
                                 # Generations plots with fitness and satisfied clause
