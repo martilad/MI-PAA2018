@@ -8,3 +8,4 @@ out
 *.log
 *.out
 *.synctex.gz
+tmp

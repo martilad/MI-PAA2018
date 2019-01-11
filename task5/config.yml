@@ -1,12 +1,12 @@
 RUN:
-    out: ./outS1/t
+    out: ./out/ctv
     in: ./instCtV
 GA:
     generationcount: 200
     generationsize: 100
     mutation: 0.05
     crossover: 0.7
-    selection: 0.01 0.6 0.05
-    selection_add: 2
+    selection: 0.01 1.5 0.1
+    selection_add: 0
     elitism: 1
     fitness: 0.99
