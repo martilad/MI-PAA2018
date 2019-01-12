@@ -156,18 +156,19 @@ Na obrázku \ref{fig:normalrun} je ještě patrný vysoký koeficient ve fitness
 
 \begin{figure}
 	\centering
-    \begin{minipage}[c]{0.42\textwidth}
+    \begin{minipage}[c]{0.48\textwidth}
         \centering\includegraphics[width=\textwidth]{img/time_gen_cnt_sz.pdf} 
     \end{minipage}
-    \begin{minipage}[c]{0.42\textwidth}
+    \begin{minipage}[c]{0.48\textwidth}
         \centering \includegraphics[width=\textwidth]{img/time_n_var_cla.pdf} 
     \end{minipage}
     \\
    \caption{Na grech jsou vidět časové náročnosti. Na levém grafu je zobrazena časová náročnost na velikosti populace a počtu generací. Na pravém grafu je zobrazena časová závislos na počtu proměných a počtu klauzulí v problému.}\label{fig:time}
 \end{figure} 
 \subsection{Závislosti některý parametrů instancí a algoritmu na výpočetním čase}
+Závislosti na čase, které předpokládám jsou, že na počtu generací a počtu proměných bude algoritmus závislý lineárně. Podle naprogramovanho řešení by měl být algoritmus závislý lineárně i na počtu proměných a počtu klauzulí. Počet klauzulí by však měl běhy ovlivnit méně. 
 
-
+Předpoklady se potvrdili a výsledky z měření je možné vidět na obrázku \ref{fig:time}. Závislost na počtu jedicnů v populaci je lineární jak je patrné. Závislost počtu generační cyklů se úplně lineární nejeví, ale v případě tohoto měření je to způsobeno narustající velikostí turnaje s každou generací pro zesílení selekčního tlaku, který jsem se rozhodl použít v základním nastavení. Závislost na počtu proměných a počtu klauzulí je také lineární avšak s velmi rozdílným koeficientem u přímky pokud bych se pokusil body proložit přímkou pomocí lineární regrese.
 
 
 
