@@ -8,6 +8,9 @@
 \usepackage[czech]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{blindtext}
+\usepackage{pdflscape}
+\usepackage{wrapfig}
+\usepackage{epsfig}
 \usepackage{scrextend}
 \addtokomafont{labelinglabel}{\sffamily}
 \hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
@@ -49,10 +52,10 @@ kde $S$ je jedno řešení a $a$ koeficient určující poměr členů, kde vyso
 V rámci řešení budu pracovat i s konfiguracemi, které nejsou řešením, protože prostor řešení je obrovský a jen pár konfigurací splňuje kritérium úspěšnosti řešení a při jeho oříznutí bych mohl dostat nespojitý prostor, kde bych mohl často uváznout v lokálním minimu.
 
 \section{Popis implementovaného genetického algoritmu}\label{kap:popisALG}
-Implementovaný genetický algoritmus je algoritmus, který se skládá z hlavního generačního cyklu a příslušných method, mezi hlavní patří selekce, mutace, křížení. Algoritmus je možné rozšířit i o mnoho dalších method např. elitismus nebo obměnu populace. Algoritmus je iterativní, kde počet cyklů může určovat předem daný počet nebo může být zastaven nějakou heuristikou. V práci jsem použil pevný počet cyklů, který je možné zadat. V každém cyklu je spočítána hodnota fitness funkce pro každého jedince. Dále jsou pomocí selekce vybíráni jedinci do nové populace. Tito jedinci mohou být kříženi a další vliv na ně má i mutace. Pomocí těchto method je možné udržet divezifikovanou populaci, pomocí které je probledáván stavový prostor. Popis jednotlivých metod:
+Implementovaný genetický algoritmus je algoritmus, který se skládá z hlavního generačního cyklu a příslušných method, mezi hlavní patří selekce, mutace, křížení. Algoritmus je možné rozšířit i~o~mnoho dalších method např. elitismus nebo obměnu populace. Algoritmus je iterativní, kde počet cyklů může určovat předem daný počet nebo může být zastaven nějakou heuristikou. V práci jsem použil pevný počet cyklů, který je možné zadat. V každém cyklu je spočítána hodnota fitness funkce pro každého jedince. Dále jsou pomocí selekce vybíráni jedinci do nové populace. Tito jedinci mohou být kříženi a další vliv na ně má i mutace. Pomocí těchto method je možné udržet divezifikovanou populaci, pomocí které je probledáván stavový prostor. Popis jednotlivých metod:
 \begin{labeling}{alligator}
 \item[\textbf{Elitismus}] Je výběr nejlepších jedinců, kteří jdou do nové populace. Tento princip může vést k rychlé konvergenci populace.
-\item[\textbf{Selekce}] Selekci jsem implementoval pomocí turnaje. Selekční tlak je řízen velikostí turnaje, kde malé turnaje davájí šanci vybrat i slabé jednice. Tedy toto je výhodně spíše na začátku, proto jsem v algoritmu vytvořil možsnot nastavení postupného růstu velikosti turnaje s každou generací. Jedinci sou do turnaje vybíráni náhodně s opakování přes celou generaci. 
+\item[\textbf{Selekce}] Selekci jsem implementoval pomocí turnaje. Selekční tlak je řízen velikostí turnaje, kde malé turnaje davájí šanci vybrat i slabé jednice. Tedy toto je výhodně spíše na začátku, proto jsem v~algoritmu vytvořil možsnot nastavení postupného růstu velikosti turnaje s~každou generací. Jedinci sou do turnaje vybíráni náhodně s~opakování přes celou generaci. 
 \item[\textbf{Křížení}] Dva jedinci vybraní selekcí můžu být s nějakou pravděpodobností kříženi. Z křížení vzniknou nový potomci, kteří budou tvořit základ nové generace. Křížení je možné provádět více způsoby, kde jsem zvolil dvoubodové křížení.
 \item[\textbf{Mutace}] Je určena pravděpodobností změny každého bitu jedince. Provádí se pro každého jedince v nové generaci.
 
@@ -72,18 +75,18 @@ Turnaj je prováděn vybíráním počtu náhodných indexů, kde je z jedninců
 \item[\textbf{mutation}] Pravděpodobnost mutace jednoho bitu.
 \item[\textbf{crossover}] Pravděpodobnost křížení jedinců.
 \item[\textbf{selection}] Procento určijící kolik jedinců z populace bude vybráno.
-\item[\textbf{selection\_add}] Počet jednců o kolik je v každé generaci zvětšena velikost turnaje. Není zadáno v procentech a je možné zadat pouze jednu hodnotu.
+\item[\textbf{selection\_add}] Počet jednců o kolik je v každé generaci zvětšena velikost turnaje. Není zadáno v~procentech a je možné zadat pouze jednu hodnotu.
 \item[\textbf{elitism}] Počet nejlepších jedinců, kteří jsou vybraní do nové generace. Není možné zadat intervalem s krokem.
 \item[\textbf{fitness}] Hodnota koeficientu $a$ popsaného v kapilole \ref{kap:rozbor}. Není možné zadat rozsahem hodnot a krokem.
 \end{labeling}
 
 \section{Testovací data}\label{kap:data}
-Testovací data k problému nebyly poskytnuty globálně, ale bylo nutné si nějaké testovací instance vytvořit nebo sehnat. Já jsem se při řešení problému omezil na instance problému 3-SAT, které lze bez vah jednotlivých problému, jednoduše sehnat na stránkách prot SAT Competition nebo SAT Race. První sadu (v experimentech označovanou jako D1) instancí jsem použil instance ze \href{https://www.cs.ubc.ca/~hoos/SATLIB/benchm.html}{SATLIB}, kde mám k dispozici instance s počtem proměných od 91 do 175. Poměr klauzulí ku počtu proměných je přibližně 4.3, tedy tyto instance jsou nejtěžšími pro 3-SAT. Dále mám k dispozici instance 3-SAT náhodně generované (pomocí \href{https://toughsat.appspot.com/}{generátoru}) s počtem proměných 50, ale s rozsahem poměru klauzulí a proměných od 3 do 8 (v experimentech označovanou jako D2). Všechny instance jsou ve formátu DIMACS. 
+Testovací data k problému nebyly poskytnuty globálně, ale bylo nutné si nějaké testovací instance vytvořit nebo sehnat. Já jsem se při řešení problému omezil na instance problému 3-SAT, které lze bez vah jednotlivých problému, jednoduše sehnat na stránkách prot SAT Competition nebo SAT Race. První sadu (v experimentech označovanou jako D1) instancí jsem použil instance ze \href{https://www.cs.ubc.ca/~hoos/SATLIB/benchm.html}{SATLIB}, kde mám k dispozici instance s počtem proměných od 91 do 175. Poměr klauzulí ku počtu proměných je přibližně 4,3, tedy tyto instance jsou nejtěžšími pro 3-SAT. Dále mám k dispozici instance 3-SAT náhodně generované (pomocí \href{https://toughsat.appspot.com/}{generátoru}) s počtem proměných 50, ale s rozsahem poměru klauzulí a proměných od 3 do 8 (v experimentech označovanou jako D2). Všechny instance jsou ve formátu DIMACS. 
 
 Pro splnění zadání bylo nutné dogenerovat váhy k jednotlivým proměným. Pro zachování for\-mátu a možnosti využití těchto instancí i pro SAT řešiče, jsem váhy uložil jako komentář~\textit{"c~weights~2~\dots"}, aby nebyl porušen formát souboru. Váhy jsem generoval náhodně z rozsahu 1-50 jako celá čísla. 
 
 \section{Testovací platforma}\label{kap:platform}
-Řešení samotného genetického algoritmu bylo vytvořeno v Cythonu a přeloženo do jazyka C. Experimenty jsem prováděl ve virtuálním prostředí s operačním systémem Debian 9. Procesor Intel Core i5 5200U @ 2.20GHz a testy byly prováděné v režimu jednoho vlákna, při minimálním zatížení počítače dalšími programy.
+Řešení samotného genetického algoritmu bylo vytvořeno v Cythonu a přeloženo do jazyka C. Experimenty jsem prováděl ve virtuálním prostředí s operačním systémem Debian 9. Procesor Intel Core i5 5200U @ 2,20GHz a testy byly prováděné v režimu jednoho vlákna, při minimálním zatížení počítače dalšími programy.
 \subsection{Cíle}\label{kap:cil}
 
 V genetickém algoritmu lze měnit jeho paramentry, cílem tedy je odzkoušet heuristiku v řešení vážené splnitelnosti SAT problému v závislosti na těchto parametrech. Cílem je prozkoumat nastavení genetického algoritmu tak, aby algoritmus byl schopen řešit co nejvíce problému nebo řešit problémy s co nejmenší chybou.
@@ -103,7 +106,7 @@ V genetickém algoritmu lze měnit jeho paramentry, cílem tedy je odzkoušet he
     \begin{minipage}[c]{0.48\textwidth}
         \centering \includegraphics[width=\textwidth]{img/runW.pdf} 
     \end{minipage}
-   \caption{Na obrázcích jsou grafy generované při běhu algoritmu. Vlevo nahoře je graf, kde je v rámci generací zobrazen počet splněných klauzulí. Pod ním je stejný graf pouze s rozdílem, že zde jsou zobrazeny hodnoty fitness funkce. Graf vpravo nahoře ukazuje počet řešení v populaci v rámci generačního cyklu. Na grafu pod ním je vývoj maximální dosažené váhy proměných v rámci generačního cyklu.}\label{fig:normalrun}
+   \caption{Na obrázcích jsou grafy generované při běhu algoritmu. Vlevo nahoře je graf, kde je v rámci generací zobrazen počet splněných klauzulí. Pod ním je stejný graf pouze s rozdílem, že zde jsou zobrazeny hodnoty fitness funkce. Graf vpravo nahoře ukazuje počet řešení v~populaci v~rámci generačního cyklu. Na grafu pod ním je vývoj maximální dosažené váhy proměných v~rámci generačního cyklu.}\label{fig:normalrun}
 \end{figure} 
 
 \section{Experimenty}\label{kap:experiments}
@@ -124,9 +127,9 @@ V genetickém algoritmu lze měnit jeho paramentry, cílem tedy je odzkoušet he
 \end{figure} 
 
 
-V experimetech prozkoumám závislost genetického algoritmu na parametrech jako jsou počet generací, velikost populace, hodnota mutace, pravděpodobnost křížení a selekční tlak. Vždy se pokusím testovat jeden parametr a ostatní zafixuji, aby bylo možné měřit vliv tohoto parametru na průběh řešení. Zafixované hodnoty mají hodnotu z ukázky nastavení níže a pro hodnotu mutace je hodnota 0.05.
+V experimetech prozkoumám závislost genetického algoritmu na parametrech jako jsou počet generací, velikost populace, hodnota mutace, pravděpodobnost křížení a selekční tlak. Vždy se pokusím testovat jeden parametr a ostatní zafixuji, aby bylo možné měřit vliv tohoto parametru na průběh řešení. Zafixované hodnoty mají hodnotu z ukázky nastavení níže a pro hodnotu mutace je hodnota 0,05.
 
-V rámci běhu algoritmu program vytváří grafy o běhu a jsou zaznámenávány statistiky do csv souboru. Na obrázku \ref{fig:normalrun} jsem uvedl příklad normálního a úspěšněho běhu iterativní heuristiky. Je také vidět, že hodnota fitness funkce a počet splněných klauzulí spolu velice korelují, což bylo předpokládáno již při sestavení vzorce pro výpočet fitness funkce. Proto v následujících experimentech budu vždy uvádět jen jeden z těchto dvou grafů, protože jsou téměř totožné. Grafy na obrázku \ref{fig:normalrun} jsou vygenerovány s nastaveními níže, kde mutace je 0.05, tedy první hodnota ze seznamu. Konfigurační souborem ukaázaným níže, lze tedy řídit chování programu a algoritmu a tento soubor je nutné zadat při spuštění.
+V rámci běhu algoritmu program vytváří grafy o běhu a jsou zaznámenávány statistiky do csv souboru. Na obrázku \ref{fig:normalrun} jsem uvedl příklad normálního a úspěšněho běhu iterativní heuristiky. Je také vidět, že hodnota fitness funkce a počet splněných klauzulí spolu velice korelují, což bylo předpokládáno již při sestavení vzorce pro výpočet fitness funkce. Proto v následujících experimentech budu vždy uvádět jen jeden z těchto dvou grafů, protože jsou téměř totožné. Grafy na obrázku \ref{fig:normalrun} jsou vygenerovány s nastaveními níže, kde mutace je 0,05, tedy první hodnota ze seznamu. Konfigurační souborem ukaázaným níže, lze tedy řídit chování programu a algoritmu a tento soubor je nutné zadat při spuštění.
 
 V experimentech jsem tedy měřil především dosaženou hodnotu fitness funkce a procento spl\-něných klauzulí. Na těchto hodnotách budu také především testovat chování algoitmu na změnu parametrů za cílem nalezení nastavení, které bude při řešení problému nejúspěšnější. 
 
@@ -142,12 +145,12 @@ V experimentech jsem tedy měřil především dosaženou hodnotu fitness funkce
 \item[] 
 \item[generationcount:] 200
 \item[generationsize:] 200
-\item[mutation:] 0.05 0.21 0.05
-\item[crossover:] 0.7
-\item[selection:] 0.1
+\item[mutation:] 0,05 0,21 0,05
+\item[crossover:] 0,7
+\item[selection:] 0,1
 \item[selection\_add:] 2
 \item[elitism:] 1
-\item[fitness:] 0.99
+\item[fitness:] 0,99
 \end{labeling}  
 \end{labeling}
 \pagestyle{plain}
@@ -163,7 +166,7 @@ Na obrázku \ref{fig:normalrun} je ještě patrný vysoký koeficient ve fitness
         \centering \includegraphics[width=\textwidth]{img/time_n_var_cla.pdf} 
     \end{minipage}
     \\
-   \caption{Na grech jsou vidět časové náročnosti. Na levém grafu je zobrazena časová náročnost na velikosti populace a počtu generací. Na pravém grafu je zobrazena časová závislos na počtu proměných a počtu klauzulí v problému.}\label{fig:time}
+   \caption{Na grech jsou vidět časové náročnosti. Na levém grafu je zobrazena časová náročnost na velikosti populace a počtu generací. Na pravém grafu je zobrazena časová závislost na počtu proměných a počtu klauzulí v problému.}\label{fig:time}
 \end{figure} 
 \subsection{Závislosti některý parametrů instancí a algoritmu na výpočetním čase}
 Závislosti na čase, které předpokládám jsou, že na počtu generací a počtu proměných bude algoritmus závislý lineárně. Podle naprogramovanho řešení by měl být algoritmus závislý lineárně i na počtu proměných a počtu klauzulí. Počet klauzulí by však měl běhy ovlivnit méně. 
@@ -171,105 +174,138 @@ Závislosti na čase, které předpokládám jsou, že na počtu generací a po�
 Předpoklady se potvrdili a výsledky z měření je možné vidět na obrázku \ref{fig:time}. Závislost na počtu jedicnů v populaci je lineární jak je patrné. Závislost počtu generační cyklů se úplně lineární nejeví, ale v případě tohoto měření je to způsobeno narustající velikostí turnaje s každou generací pro zesílení selekčního tlaku, který jsem se rozhodl použít v základním nastavení. Závislost na počtu proměných a počtu klauzulí je také lineární avšak s velmi rozdílným koeficientem u přímky pokud bych se pokusil body proložit přímkou pomocí lineární regrese.
 
 
+\begin{wrapfigure}{r}{0.55\textwidth}
+\begin{center}
+\includegraphics[width=0.55\textwidth]{img/sat_gen_size.pdf} 
+\caption{Na obrázku je graf, kde je zobrazena úspěšnost v závislosti na velikosti populace.}
+\label{fig:genSize}
+\end{center}
+\end{wrapfigure}
+
+\subsection{Závislost na velikosti populace}
+Na první parametr genetického algoritmu, na který jsem se zaměřil je velikost populace. Ta určuje kolik řešení je vylepšováno a šlechtěno. Optimum tohoto parametru se velice odvíjí od složitosti problému. Já jsem jako základní hodnotu zvolil 100, neboť by mohla být dostačující pro obtížné problémy.
+
+Z experimetu na obrázku \ref{fig:genSize} je vidět, že mnou odhadnutá počáteční velikost se zdá dobrá pro náhodně generované problémy D2, avšak problémy ze SATLIB, které mají všechny poměr klauzulí a proměných okolo 4,3, již tento počet optimální není. A je vidět, že s rostoucím počtem roste i úspěšnost na problémech D1. Z těchto měření bych tedy jako základní parametr algoritmu pro řešení problémů nastavil hodnotu 400. Problém vážené splnitelnosti formule v normální tvaru patří mezi velice optížné problémy.
+
+
+\begin{figure}
+	\centering
+	\begin{minipage}[c]{0.74\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/sat_gen_count.pdf} 
+    \end{minipage}
+    \\
+    \begin{minipage}[c]{0.325\textwidth}
+        \centering\includegraphics[width=\textwidth]{img/gc1p.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.325\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/gc1s.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.325\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/gc1w.pdf} 
+    \end{minipage}
+    \\
+    \begin{minipage}[c]{0.325\textwidth}
+        \centering\includegraphics[width=\textwidth]{img/gc2p.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.325\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/gc2s.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.325\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/gc2w.pdf} 
+    \end{minipage}
+    \\
+    \begin{minipage}[c]{0.325\textwidth}
+        \centering\includegraphics[width=\textwidth]{img/gc3p.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.325\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/gc3s.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.325\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/gc3w.pdf} 
+    \end{minipage}
+   \caption{Na tomto obrázku je nahoře uveden graf úspěšnosti v závislosti na cílovém počtu generací. Na grafech níže je průběh algoritmu pro různé počty generací. V levém sloupci jsou počty splněných klauzulí, uprostřed počet řešení a v pravém sploupci je hodnota výsledného řešení. (Na prvních třech grafech jsou na ose x desetiná čísla. Generace samozřejmě byla pouze celá čísla, toto je chyba u velmi nízkého počtu generací a čísla lze brát jako orientační.)}\label{fig:gencount}
+\end{figure} 
 
 
 \subsection{Závislost na počtu generací}
-no asi na tom něco bude...
+Na další parametr, na který jsem se zaměřil, je počet generací. Předpoklady v této kapitole byli jasné. S počtem generací roste i množství prozkoumaných řešení. Ty se, ale s velikým množství generací již mohou opakovat a proto by byla jen neuměrně navýšena doba běhu, ale na iterační sílu algoritmu by to již němelo vliv. 
+
+Výsledky jsou zobrazeny na obrázku \ref{fig:gencount}. První graf je průměr při testování všech instancí. Grafy dole jsou úkázky běhu pro jednu vybranou instanci problému. Na prvním grafu je například vidět, že větší počet generací má větší vliv  na databázi D1, tedy problémy ze SATLIB. S dalším zvětšováním počtu generací se tento rozdíl tak nezvyšuje, ale čas stále narůstá minimálně lineárně (záleží jestli je zvyšován selekční tlak). Jako základní velikost pro experimenty jsem zvolil hodnotu 200. Z dat tohoto experimentu bych jako optimální počet generací volil 400 i přes vyšší časovou náročnost. 
+
+Na grafech ze třech běhů je vidět, že se s zvýšením generačního cyklu zvýšila i iterační síla. Zvlášt je to vidě na grafech vpravo na obrázku \ref{fig:gencount}. Kde se již pro počet generací 175 podařílo dosáhnout hodnoty 1100 oproti 800 dozažených při pouze 20 generacích. 
+
+\begin{wrapfigure}{r}{0.55\textwidth}
+\begin{center}
+\includegraphics[width=0.55\textwidth]{img/sat_cross.pdf} 
+\caption{Na obrázku je graf, kde je zobrazena úspěšnost v závislosti na pravděpodobnosti křížení.}
+\label{fig:cross}
+\end{center}
+\end{wrapfigure}
+
+\subsection{Závislost na pravděpodobnosti křížení vybraných jedinců}
+Tento parametr jsem neodhadoval, ale pro základní nastavení jsem využil použití genetického algoritmu v jiném předmětu a základní hodnotu nastavil na 0,7. Implementoval jsem dvě křížení a to uniformní a dvoubodové, kde jsem ve výsledku nakonec používál dvoubodové, které záchová větší časti genu pohromadě. Uniformní křížení by mohlo mít vliv jen náhodněho zámíchání dvou jedinců a jev by se mohl blížit mutaci. 
+
+Z obrázku \ref{fig:cross} je patrné, že procento křížení nemá tak veliký vliv na úspěšnost při řešení vážené splnitelnosti booleovské formule. Avšak pro oba datasety se maximální úspěšnosti dosahuje pro hodnotu pravděpodobnosti křížení 0,6. Tedy pro nastavení při řešení, co největšího množství problémů, bych zvolil místo nastavení pravděpodobnosti křížení 0,7, hodnotu 0,6.
+
+\begin{wrapfigure}{r}{0.55\textwidth}
+\begin{center}
+\includegraphics[width=0.55\textwidth]{img/sat_mut.pdf} 
+\caption{Na obrázku je graf, kde je zobrazena úspěšnost v závislosti na pravděpodobnosti mutace.}
+\label{fig:mut}
+\end{center}
+\end{wrapfigure}
+
+\subsection{Závislost na pravděpodobnosti mutace}
+U tohoto parametru jsem odhadoval, že bude určitě existovat hranice, do které se bude úspěšnost algoritmu zlepšovat, neboť bude mít mutace pozitivní vlik na diverzifikaci populace. Avšak za nějakou hraniční hodnotou, potom mutace způsobí, že populace nebude spěřovat k lepším řešením, ale bude to náhodná procházka prostorem s diverzifikovanou populací, které se ovšem i tak může podařit nalézt řešení, neboť genetický algoritmus je randomizovaný.
 
 
+
+
+
+\begin{landscape}
 \begin{figure}
 	\centering
-    \begin{minipage}[c]{0.325\textwidth}
-        \centering\includegraphics[width=\textwidth]{img/1c.pdf} 
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering\includegraphics[width=\textwidth]{img/m001g.pdf} 
     \end{minipage}
-    \begin{minipage}[c]{0.325\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1c.pdf} 
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/m001s.pdf} 
     \end{minipage}
-    \begin{minipage}[c]{0.325\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1w.pdf} 
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/m051g.pdf} 
     \end{minipage}
-    \\
-    \begin{minipage}[c]{0.49\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1c.pdf} 
-    \end{minipage}
-    \begin{minipage}[c]{0.49\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1w.pdf} 
-    \end{minipage}
-   \caption{Zde jsou uvedené grafy vývoje řešení pro vybrané hodnoty počtu iterácí na jedné teplotě. Konkrétně zleva pro hodnoty 30, 60, 120, 240, 300}\label{fig:GVPT}
-\end{figure} 
-
- 
-\begin{figure}
-	\centering
-    \begin{minipage}[c]{0.42\textwidth}
-        \centering\includegraphics[width=\textwidth]{img/1c.pdf} 
-    \end{minipage}
-    \begin{minipage}[c]{0.42\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1s.pdf} 
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/m051s.pdf} 
     \end{minipage}
     \\
-   \caption{Na levém grafu je závislost relativní chyby na koeficientu ochlazování. Na pravém grafu je závislost výpočetního času na koeficientu ochlazování}\label{fig:GZNK}
-\end{figure} 
-
-
-
-\begin{figure}
-	\centering
-    \begin{minipage}[c]{0.48\textwidth}
-        \centering\includegraphics[width=\textwidth]{img/1c.pdf} 
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering\includegraphics[width=\textwidth]{img/m101g.pdf} 
     \end{minipage}
-    \begin{minipage}[c]{0.48\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1s.pdf} 
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/m101s.pdf} 
     \end{minipage}
-    \\
-    \begin{minipage}[c]{0.48\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1c.pdf} 
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/m151g.pdf} 
     \end{minipage}
-    \begin{minipage}[c]{0.48\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1c.pdf} 
-    \end{minipage}
-   \caption{Zde jsou uvedené grafy vývoje řešení pro vybrané hodnoty koeficientu ochlazovaní. Konkrétně zleva pro hodnoty 0.993, 0.995, 0.997, 0.999}\label{fig:GVPK}
-\end{figure} 
-
- 
-
-
- \begin{figure}
-	\centering
-    \begin{minipage}[c]{0.42\textwidth}
-        \centering\includegraphics[width=\textwidth]{img/1c.pdf} 
-    \end{minipage}
-    \begin{minipage}[c]{0.42\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1c.pdf} 
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/m151s.pdf} 
     \end{minipage}
     \\
-   \caption{Na levém grafu je závislost relativní chyby na počtu iterací na jedné teplotě. Na pravém grafu je závislost výpočetního času na počtu iterací na jedné teplotě}\label{fig:GZNC}
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering\includegraphics[width=\textwidth]{img/m201g.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/m201s.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/m251g.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.35\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/m251s.pdf} 
+    \end{minipage}
+   \caption{Na tomto obrázku je nahoře uveden graf úspěšnosti v závislosti na cílovém počtu generací. Na grafech níže je průběh algoritmu pro různé počty generací. V levém sloupci jsou počty splněných klauzulí, uprostřed počet řešení a v pravém sploupci je hodnota výsledného řešení. (Na prvních třech grafech jsou na ose x desetiná čísla. Generace samozřejmě byla pouze celá čísla, toto je chyba u velmi nízkého počtu generací a čísla lze brát jako orientační.)}\label{fig:mut}
 \end{figure} 
-
-\begin{figure}
-	\centering
-    \begin{minipage}[c]{0.32\textwidth}
-        \centering\includegraphics[width=\textwidth]{img/1c.pdf} 
-    \end{minipage}
-    \begin{minipage}[c]{0.32\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1s.pdf} 
-    \end{minipage}
-    \begin{minipage}[c]{0.32\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1g.pdf} 
-    \end{minipage}
-    \\
-    \begin{minipage}[c]{0.32\textwidth}
-        \centering\includegraphics[width=\textwidth]{img/1w.pdf} 
-    \end{minipage}
-    \begin{minipage}[c]{0.32\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1c.pdf} 
-    \end{minipage}
-    \begin{minipage}[c]{0.32\textwidth}
-        \centering \includegraphics[width=\textwidth]{img/1c.pdf} 
-    \end{minipage}
-   \caption{Zde jsou uvedené grafy vývoje řešení pro vybrané hodnoty počtu iterácí na jedné teplotě. Konkrétně zleva pro hodnoty 30, 60, 120, 180, 240, 300}\label{fig:GVPC}
-\end{figure} 
-
+\end{landscape} 
 
 \section{Závěr}\label{kap:zaver}
 Během experimentu jsem prozkoumal pokročilou iterativní heuristiku - simulované ochlazování. Ověřil a prozkoumal jsem závislosti této heuristiky na řídících parametrech. Parametry jsou určitě závislé na daných problémech či paramentech instancí, což je patrné i ze vzorců, kde přímo vystupuje rozdíl cen řešení. Tyto rozdíly se mohou pohybovat v různých intervalech a tomu je potřeba parametry také upravit, tedy hýbat s počáteční teplotou, která ve vzorci vystupuje jako druhý parametr. 
