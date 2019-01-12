@@ -166,7 +166,7 @@ Na obrázku \ref{fig:normalrun} je ještě patrný vysoký koeficient ve fitness
         \centering \includegraphics[width=\textwidth]{img/time_n_var_cla.pdf} 
     \end{minipage}
     \\
-   \caption{Na grech jsou vidět časové náročnosti. Na levém grafu je zobrazena časová náročnost na velikosti populace a počtu generací. Na pravém grafu je zobrazena časová závislost na počtu proměných a počtu klauzulí v problému.}\label{fig:time}
+   \caption{Na grafech jsou vidět časové náročnosti. Na levém grafu je zobrazena časová náročnost na velikosti populace a počtu generací. Na pravém grafu je zobrazena časová závislost na počtu proměných a počtu klauzulí v problému.}\label{fig:time}
 \end{figure} 
 \subsection{Závislosti některý parametrů instancí a algoritmu na výpočetním čase}
 Závislosti na čase, které předpokládám jsou, že na počtu generací a počtu proměných bude algoritmus závislý lineárně. Podle naprogramovanho řešení by měl být algoritmus závislý lineárně i na počtu proměných a počtu klauzulí. Počet klauzulí by však měl běhy ovlivnit méně. 
@@ -307,7 +307,63 @@ Na obrázku \ref{fig:mut} jsou zobrazena data z testování vlivu mutace. Předp
 
 Na další obrázku \ref{fig:mutAll} jsem se pokusil zachytit, jak hodnota mutace půzobí na průběh řešení a jaký má vliv na skladbu populace. Na prvních grafech s velmi malou hodnotou mutace je patrná omezená skladba populace, kde po pár generacích jsou všichni jedinci v nějakém stejném optimu, které nemusí být globální a prozkoumávaný prostor je velice malý. Se zvětšující se mutací, také roste diverzita populace a již se zde nenachází tolik řešení a může být prozkoumáno větší okolí. V rostoucí mutací vídíme i ubývající počet řešení v populaci. Na posledních obrázcích je patrná populace, která již nesměřuje k řešení, ale mutace překonává selekční tlak a je to vlastně zkoumání náhodných konfigurací, ale i zde se v jedné generaci díky randomizovanosti a jednodušímu problému podařílo nalézt řešení. 
 
+\begin{figure}
+	\centering
+    \begin{minipage}[c]{0.48\textwidth}
+        \centering\includegraphics[width=\textwidth]{img/sat_s_small.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.48\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/sat_s_big.pdf} 
+    \end{minipage}
+    \\
+   \caption{Na grafech je vidět závislost úspěšnosti algoritmu na velikosti turnaje. Na obrázku vlevo je navíc zvyšující se velikost turnaje s každou generací o 2. Na pravém grafu toto použito není.}\label{fig:sel}
+\end{figure} 
 
+\subsection{Závislost na velikosti turnaje při selekci}
+Další testovaný parametr byla selekce. V genetickém lgoritmu jsem implementoval turnojovou selekci. Selekční tlak je tedy řízen velikosti turnaje, kde malý turnaj dává velkou naději horším řešením z populace. Tento parametr je klíčový pro tzv. "tah na bránu", tedy aby algoritmus směřoval k nějakému optímální řešení, nejlépe globalnímu. 
+
+Na grafu \ref{fig:sel} je vidět úspěšnsnost na velikosti turnaje. Na levém grafu není patrný růst, ba naopak se zvyšující se mírou selekce, populace rychle konverguje. Toto je způsobeno zvyšujícím se selekčním tlakem, který i při nízkém nastavení rostl o konstantu a při způsobu testování, kde beru hodnotu fitness a procento splněných klauzulí se tento jev neprojeví. Tedy s narůstající hodnotou selekce je možné nastavit počáteční velikost selekce nízkou a tím dát algoritmu možnost prozkoumat větší část prostoru při přijímání horších řešení. 
+
+Naopak na druhém grafu na obrázku \ref{fig:sel} je zobrazen vývoj selekce bez zvyšující se hodnoty. Zde jsou pro malou hodnotu patrné   horší výsledky, ale již pro 10 \% populace je hodnota selekce nejlepší pro náhodné problémy z datasetu D2. Pro dataset D1 je optimum až někde kolem 80 \% velikosti populace, tedy pro tyto data byl vhodnější vyšší selekční tlak. 80 \% však neznamená že pujde do turnaje 80 ze 100 jedinců. Jedinci jsou vybíráni náhodně s opakováním, takže se výsledný skutečný poměr může lišit.
+
+Po testech bych jako optimální selekční tlak zvolil okolo 10 \% a s postupným zvyšování selekčního tlaku, tak jak jsem tyto parametry odhadnul na začátku. 
+
+NA grafu \ref{fig:selrun} jsem ještě zobrazil ukázky z běhu, kde na levém obrázku je běh s nedostatečným selekčním tlakem, algoritmus tedy vůbec nekonverguje. Na pravém obrázku je graf s 10 \% selekcí bez zvyšování selekčního tlaku. 
+
+\begin{figure}
+	\centering
+    \begin{minipage}[c]{0.48\textwidth}
+        \centering\includegraphics[width=\textwidth]{img/s_big_bad.pdf} 
+    \end{minipage}
+    \begin{minipage}[c]{0.48\textwidth}
+        \centering \includegraphics[width=\textwidth]{img/s_big_better.pdf} 
+    \end{minipage}
+    \\
+   \caption{Na grafech je vidět průběh populace s rozdílnou hodnotou selekčního tlaku.}\label{fig:selrun}
+\end{figure} 
+
+
+
+
+
+\begin{wrapfigure}{r}{0.55\textwidth}
+\begin{center}
+\includegraphics[width=0.55\textwidth]{img/boxRatio.pdf} 
+\caption{Na obrázku je graf, kde je zobrazena úspěšnost v závislosti poměru počtu klauzulí na počtu proměných.}
+\label{fig:box}
+\end{center}
+\end{wrapfigure}
+
+\pagebreak
+
+\subsection{Závislost na na poměru počtu klauzulí k počtu poroměných}
+Na závěr jsem nastavil parametry a pokusil se změřit zdali je genetický algoritmus citlivý na poměr klauzulí a počtu proměných, při náhodně generovaných problémech a u váženého splnitelnosti booleovské formule.
+
+Na obrázku \ref{fig:box} tato závislost není patrná. Spíše je patrná závislost na počtu klauzulí, protože testovací dataset má fixní počet proměných a jen je zvyšován počet klauzulí. Pro nízký poměr jsou klauzule jednoduší a téměř všechny byli vyřešeny a byly optimalizovány váhy. Se zvyšujícím se poměrem náročnost stále stoupala a ani s vyšší poměrem nebyli problémy opět jednodušeji řešitelné. Toto je způsobeno nejspíš, protože se zde nachází více podmínek (klauzulí) a genetický algoritmus je randomizovaný a jen se snaží vylepšovat konfigurace (nějaké nastavení proměných) 
+
+Naopak součásti většiny standartních řešičů SAT, které jsou založeny na CDCL nebo i jednoduché lokální algoritmy jako GSAT a WALKSAT, využívají při běhu jednotkovou propagaci. Tedy pokud klauzule ještě není splněná, ale již zbývá poslední neohodnocený literál, tak je nutné ho ohodnotit pozitivně. Jednotková propagace je velice efektivní pokud je v problému mnoho omezení (mnoho klauzulí) tedy při vysokém poměru náročnost při využití jednotkové propagace může velmi rychle klesat, protože díky jednotkové propagaci se povede vyřešit velké množství klauzulí. (Algoritmy a metody GSAT, WALKSAT, CDCL probrány v rámci předmětu MI-UMI)
+
+Náhodně vygenerováné testovací problémy z datasetu D2 by bylo třeba otestovat na nějakém SAT řešiči, zdali se v tomto datasetu tento jev vůbec vyskuje, neboť to je teoretický předpoklad. Dále by bylo nutné závislost genetického algoritmu na poměru mnohem více prozkoumat, aby jí bylo možné s jistoutou například vyvrátit. Tento experiment můžu vzít jako směr, který by bylo nutné dále a důkladně prozkoumat.
 
 \section{Závěr}\label{kap:zaver}
 Během experimentu jsem prozkoumal pokročilou iterativní heuristiku - simulované ochlazování. Ověřil a prozkoumal jsem závislosti této heuristiky na řídících parametrech. Parametry jsou určitě závislé na daných problémech či paramentech instancí, což je patrné i ze vzorců, kde přímo vystupuje rozdíl cen řešení. Tyto rozdíly se mohou pohybovat v různých intervalech a tomu je potřeba parametry také upravit, tedy hýbat s počáteční teplotou, která ve vzorci vystupuje jako druhý parametr. 
