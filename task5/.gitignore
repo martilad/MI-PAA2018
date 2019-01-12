@@ -1,0 +1,12 @@
+.idea
+__venv__
+*.so
+*egg*
+*.c
+out
+*.aux
+*.log
+*.out
+*.synctex.gz
+tmp
+*.pyg
