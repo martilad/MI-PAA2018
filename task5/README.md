@@ -2,8 +2,8 @@
 
 ## Testovací instance 
 
-Ve složce `instCtV` byly vygenerovány pomocí stránky https://toughsat.appspot.com/
-Ve složce `instNV` byly využity testovací instance ze stránky https://www.cs.ubc.ca/~hoos/SATLIB/benchm.html
+Ve složce `instCtV` byly vygenerovány pomocí stránky https://toughsat.appspot.com/ (D2)
+Ve složce `instNV` byly využity testovací instance ze stránky https://www.cs.ubc.ca/~hoos/SATLIB/benchm.html (D1)
 Všechny testovací instance byli přejmenovány, kde se v názvu nachází počet proměných a klausulí a také poměr clausulí ku počtu proměným.
 Dále byly pro všechny testovací instance dogenerovány náhodně váhy k proměným v rozsahu od 1 do 50. Tyto váhy byly přídány jako řádek komentáře `c weights 20 ...`, tak aby byl zachován formát souboru DIMACS.
 
