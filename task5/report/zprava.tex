@@ -256,11 +256,9 @@ Z obrázku \ref{fig:cross} je patrné, že procento křížení nemá tak velik�
 \end{wrapfigure}
 
 \subsection{Závislost na pravděpodobnosti mutace}
-U tohoto parametru jsem odhadoval, že bude určitě existovat hranice, do které se bude úspěšnost algoritmu zlepšovat, neboť bude mít mutace pozitivní vlik na diverzifikaci populace. Avšak za nějakou hraniční hodnotou, potom mutace způsobí, že populace nebude spěřovat k lepším řešením, ale bude to náhodná procházka prostorem s diverzifikovanou populací, které se ovšem i tak může podařit nalézt řešení, neboť genetický algoritmus je randomizovaný.
+U tohoto parametru jsem odhadoval, že bude určitě existovat hranice, do které se bude úspěšnost algoritmu zlepšovat, neboť bude mít mutace pozitivní vlik na diverzifikaci populace. Avšak za nějakou hraniční hodnotou, potom mutace způsobí, že populace nebude směřovat k lepším řešením, ale bude to náhodná procházka prostorem s diverzifikovanou populací, které se ovšem i tak může podařit nalézt řešení, neboť genetický algoritmus je randomizovaný.
 
-
-
-
+Na obrázku \ref{fig:mut} jsou zobrazena data z testování vlivu mutace. Předpoklad existence hranice, kde bude mutace ještě prospěšná, se potvrdil. Z grafu jde vidět, že ale tato hranice je pro každý dataset jiná. Toto může být způsobeno počtem proměných nebo poměrem klauzulí a počtu proměných. Tento jev a zlom by bylo dobré při dalším testování více prozkoumat a pokusit se zachytit jeho závislosti. Podle grafu bych jako optimální hodnotu oproti zvolené 0,05 volil hodnotu asi jen o malinko vyšší, tedy 0,06. 
 
 \begin{landscape}
 \begin{figure}
@@ -303,9 +301,13 @@ U tohoto parametru jsem odhadoval, že bude určitě existovat hranice, do kter�
     \begin{minipage}[c]{0.35\textwidth}
         \centering \includegraphics[width=\textwidth]{img/m251s.pdf} 
     \end{minipage}
-   \caption{Na tomto obrázku je nahoře uveden graf úspěšnosti v závislosti na cílovém počtu generací. Na grafech níže je průběh algoritmu pro různé počty generací. V levém sloupci jsou počty splněných klauzulí, uprostřed počet řešení a v pravém sploupci je hodnota výsledného řešení. (Na prvních třech grafech jsou na ose x desetiná čísla. Generace samozřejmě byla pouze celá čísla, toto je chyba u velmi nízkého počtu generací a čísla lze brát jako orientační.)}\label{fig:mut}
+   \caption{Na grafech je zachycen vliv mutace na genetický algoritmus a na výsledná řešení v populaci. Grafy jsou po dvojicích zleva do prava a ze zhora dolů pro hodnoty mutace od 0,001 po 0,251 včetně s krokem 0,05.}\label{fig:mutAll}
 \end{figure} 
 \end{landscape} 
+
+Na další obrázku \ref{fig:mutAll} jsem se pokusil zachytit, jak hodnota mutace půzobí na průběh řešení a jaký má vliv na skladbu populace. Na prvních grafech s velmi malou hodnotou mutace je patrná omezená skladba populace, kde po pár generacích jsou všichni jedinci v nějakém stejném optimu, které nemusí být globální a prozkoumávaný prostor je velice malý. Se zvětšující se mutací, také roste diverzita populace a již se zde nenachází tolik řešení a může být prozkoumáno větší okolí. V rostoucí mutací vídíme i ubývající počet řešení v populaci. Na posledních obrázcích je patrná populace, která již nesměřuje k řešení, ale mutace překonává selekční tlak a je to vlastně zkoumání náhodných konfigurací, ale i zde se v jedné generaci díky randomizovanosti a jednodušímu problému podařílo nalézt řešení. 
+
+
 
 \section{Závěr}\label{kap:zaver}
 Během experimentu jsem prozkoumal pokročilou iterativní heuristiku - simulované ochlazování. Ověřil a prozkoumal jsem závislosti této heuristiky na řídících parametrech. Parametry jsou určitě závislé na daných problémech či paramentech instancí, což je patrné i ze vzorců, kde přímo vystupuje rozdíl cen řešení. Tyto rozdíly se mohou pohybovat v různých intervalech a tomu je potřeba parametry také upravit, tedy hýbat s počáteční teplotou, která ve vzorci vystupuje jako druhý parametr. 
