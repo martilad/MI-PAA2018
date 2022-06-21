@@ -7,7 +7,7 @@ gprof2dot==2017.9.19
 kiwisolver==1.0.1
 matplotlib==3.0.2
 more-itertools==4.3.0
-numpy==1.15.4
+numpy==1.22.0
 pandas==0.23.4
 pluggy==0.8.0
 py==1.7.0
